@@ -28,4 +28,4 @@ public:
     }
 };
 
-} //namespace chessboard
+} // namespace chessboard

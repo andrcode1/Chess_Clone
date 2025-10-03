@@ -28,7 +28,6 @@ struct Move {
     Square to;
     PieceType promotion{PieceType::NO_PIECE_TYPE};
     
-    Move() = default;
     Move(Square f, Square t) : from(f), to(t) {}
     Move(Square f, Square t, PieceType p) : from(f), to(t), promotion(p) {}
     
