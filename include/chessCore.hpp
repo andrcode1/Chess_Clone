@@ -1,5 +1,7 @@
-#include <string>
+#pragma once
 
+#include "Square.hpp"
+#include <string>
 
 namespace chessboard
 {
@@ -21,26 +23,16 @@ enum class Color
     NO_COLOR
 };
 
-class Square 
-{
-private:
-    int file_; // 0-7 (a-h)
-    int rank_; // 0-7
-
-public:
-    Square(int file, int rank) : file_(file), rank_(rank) {}
+struct Move {
+    Square from;
+    Square to;
+    PieceType promotion{PieceType::NO_PIECE_TYPE};
     
-    static Square fromAlgebraic(const std::string& algebraicForm);
+    Move() = default;
+    Move(Square f, Square t) : from(f), to(t) {}
+    Move(Square f, Square t, PieceType p) : from(f), to(t), promotion(p) {}
+    
     std::string toAlgebraic() const;
-    
-    int file() const { return file_; }
-    int rank() const { return rank_; }
-    
-    bool operator==(const Square& other) const { 
-        return file_ == other.file_ && rank_ == other.rank_; 
-    }
-    bool operator!=(const Square& other) const { 
-        return !(*this == other); 
-    }
 };
+
 } // namespace chessboard

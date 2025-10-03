@@ -1,4 +1,4 @@
-#include "../include/chessCore.hpp"
+#include "../include/Square.hpp"
 
 namespace chessboard
 {
