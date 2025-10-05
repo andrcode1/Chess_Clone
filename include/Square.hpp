@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chessCore.hpp"
+#include "Move.hpp"
 
 namespace chessboard
 {

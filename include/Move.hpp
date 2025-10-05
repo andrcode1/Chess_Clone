@@ -5,6 +5,7 @@
 
 namespace chessboard
 {
+    
 enum class PieceType
 {
     PAWN,
@@ -24,12 +25,12 @@ enum class Color
 };
 
 struct Move {
-    Square from;
-    Square to;
+    Square squareFrom;
+    Square squareTo;
     PieceType promotion{PieceType::NO_PIECE_TYPE};
     
-    Move(Square f, Square t) : from(f), to(t) {}
-    Move(Square f, Square t, PieceType p) : from(f), to(t), promotion(p) {}
+    Move(Square f, Square t) : squareFrom(f), squareTo(t) {}
+    Move(Square f, Square t, PieceType p) : squareFrom(f), squareTo(t), promotion(p) {}
     
     std::string toAlgebraic() const;
 };

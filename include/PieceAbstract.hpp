@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "chessCore.hpp"
+#include "Move.hpp"
 #include <vector>
 #include <string>
 
@@ -19,7 +19,7 @@ public:
     Piece(Color color, Square positionOfPiece) : color_(color), positionOfPiece_(positionOfPiece), hasMoved_(false) {};
     virtual ~Piece() = default;
     
-    virtual bool isPseudoLegalMove(Move move, Piece occupancy[8][8]) const = 0;    
+    virtual bool isPseudoLegalMove(Move move, Piece* occupancy[8][8]) const = 0;    
     virtual PieceType getType() const = 0;
     virtual std::string getSymbol() const = 0;
     virtual int getValue() const = 0;
