@@ -15,33 +15,33 @@ int Rook::getValue() const {
     return 5;
 }
 
-bool Rook::isPseudoLegalMove(Move move, Piece* occupancy[8][8]) const {
+bool Rook::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
     int rankTo = move.squareTo.rank();
 
-    bool sameFile = (fileFrom == fileTo);
-    bool sameRank = (rankFrom == rankTo);
-    
-    if (sameFile == sameRank) {  // squareFrom == squareTo or not same file/rank
-        return false;
+    bool isSameFile = (fileFrom == fileTo);
+    bool isSameRank = (rankFrom == rankTo);
+
+    if (!isSameFile && !isSameRank) {
+        return false; // Illegal move
     }
 
-    if (sameFile) {
+    if (isSameFile) {
         int start = std::min(rankFrom, rankTo) + 1;
         int end = std::max(rankFrom, rankTo);
         for (int i = start; i < end; i++) {
-            if (occupancy[i][fileFrom] != nullptr) {
-                return false;
+            if (board[i][fileFrom] != nullptr) {
+                return false; // Path is blocked by another piece.
             }
         }
     } else {
         int start = std::min(fileFrom, fileTo) + 1;
         int end = std::max(fileFrom, fileTo);
         for (int i = start; i < end; i++) {
-            if (occupancy[rankFrom][i] != nullptr) {
-                return false;
+            if (board[rankFrom][i] != nullptr) {
+                return false; // Path is blocked by another piece.
             }
         }
     }
