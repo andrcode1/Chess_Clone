@@ -1,0 +1,21 @@
+#pragma once
+
+#include "../../include/PieceAbstract.hpp"
+#include "../../include/Move.hpp"
+
+namespace chessboard
+{
+
+class Queen : public Piece
+{
+public:
+    Queen(Color color, Square position);
+    ~Queen() override = default;
+    
+    PieceType getType() const override;
+    std::string getSymbol() const override;
+    int getValue() const override;
+    bool isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const override;    
+};
+
+}
