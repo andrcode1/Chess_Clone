@@ -15,7 +15,7 @@ int Bishop::getValue() const {
     return 3;
 }
 
-bool Bishop::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const {
+bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
@@ -33,7 +33,7 @@ bool Bishop::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8]
     int currentRank = rankFrom + rankDirection;
     
     while (currentFile != fileTo && currentRank != rankTo) {
-        if (board[currentRank][currentFile] != nullptr) {
+        if (position.getPieceAt(currentRank, currentFile) != nullptr) {
             return false; // Path is blocked
         }
         currentFile += fileDirection;

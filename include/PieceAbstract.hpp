@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Move.hpp"
+#include "Position.hpp"
 #include <vector>
-#include <string>
 #include <memory>
 
 namespace chessboard
@@ -19,7 +18,8 @@ public:
     Piece(Color color, Square positionOfPiece) : color_(color), positionOfPiece_(positionOfPiece), hasMoved_(false) {};
     virtual ~Piece() = default;
     
-    virtual bool isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const = 0;    
+    virtual bool isPseudoLegalMove(const Move& move, const Position& position) const = 0;
+    // TODO: add getPseudoLegalMoves() - returns which squares piece can go to depending on its current location.
     virtual PieceType getType() const = 0;
     virtual std::string getSymbol() const = 0;
     virtual int getValue() const = 0;

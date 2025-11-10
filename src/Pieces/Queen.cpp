@@ -15,7 +15,7 @@ int Queen::getValue() const {
     return 9;
 }
 
-bool Queen::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const {
+bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
@@ -30,7 +30,7 @@ bool Queen::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][
     if (rankTo > rankFrom) {rankDirection = 1;}
     else if (rankTo < rankFrom) {rankDirection = -1;}
     
-    bool isDiagonal = (std::abs(fileFrom - fileTo) != std::abs(rankFrom - rankTo));
+    bool isDiagonal = (std::abs(fileFrom - fileTo) == std::abs(rankFrom - rankTo));
     bool isStraight = (fileDirection == 0 || rankDirection == 0);
     
     if (!isDiagonal && !isStraight) {
@@ -41,7 +41,7 @@ bool Queen::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][
     int currentRank = rankFrom + rankDirection;
     
     while (currentFile != fileTo || currentRank != rankTo) {
-        if (board[currentRank][currentFile] != nullptr) {
+        if (position.getPieceAt(currentRank, currentFile) != nullptr) {
             return false; // Path is blocked by another piece.
         }
         currentFile += fileDirection;

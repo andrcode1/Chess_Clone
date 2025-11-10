@@ -3,8 +3,6 @@
 #include "Square.hpp"
 #include "chessCore.hpp"
 
-#include <string>
-
 namespace chessboard
 {
 

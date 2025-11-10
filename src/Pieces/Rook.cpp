@@ -15,7 +15,7 @@ int Rook::getValue() const {
     return 5;
 }
 
-bool Rook::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8]) const {
+bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
@@ -32,7 +32,7 @@ bool Rook::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8
         int start = std::min(rankFrom, rankTo) + 1;
         int end = std::max(rankFrom, rankTo);
         for (int i = start; i < end; i++) {
-            if (board[i][fileFrom] != nullptr) {
+            if (position.getPieceAt(i, fileFrom) != nullptr) {
                 return false; // Path is blocked by another piece.
             }
         }
@@ -40,7 +40,7 @@ bool Rook::isPseudoLegalMove(const Move& move, std::unique_ptr<Piece> board[8][8
         int start = std::min(fileFrom, fileTo) + 1;
         int end = std::max(fileFrom, fileTo);
         for (int i = start; i < end; i++) {
-            if (board[rankFrom][i] != nullptr) {
+            if (position.getPieceAt(rankFrom, i) != nullptr) {
                 return false; // Path is blocked by another piece.
             }
         }
