@@ -65,4 +65,22 @@ bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const {
     return false;
 }
 
+    std::vector<Square> Pawn::getPseudoLegalMoves(const Square& square) const {
+        std::vector<Square> moves;
+        
+        int file = square.file();
+        int rank = square.rank();
+        int direction = (pieceColor_ == Color::WHITE) ? 1 : -1;
+        int startingRank = (pieceColor_ == Color::WHITE) ? 1 : 6;
+        
+        moves.push_back(Square(file, rank + direction));
+        moves.push_back(Square(file - 1, rank + direction));
+        moves.push_back(Square(file + 1, rank + direction));
+        if (rank == startingRank) {
+            moves.push_back(Square(file, rank + 2 * direction));
+        }
+        
+        return moves;
+    }
+
 }

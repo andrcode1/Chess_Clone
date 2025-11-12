@@ -50,7 +50,7 @@ public:
 
     Color getSideToMove() const;
     const std::unique_ptr<Piece>& getPieceAt(Square square) const;
-    const std::unique_ptr<Piece>& getPieceAt(int rank, int file) const;
+    const std::unique_ptr<Piece>& getPieceAt(int file, int rank) const;
     int getHalfmoveClock() const;
     int getFullmoveCounter() const;
     const CastlingRights& getCastlingRights() const;

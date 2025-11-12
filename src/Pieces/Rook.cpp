@@ -46,6 +46,27 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const {
         }
     }
     return true;
-}   
+}
+
+std::vector<Square> Rook::getPseudoLegalMoves(const Square& square) const {
+    std::vector<Square> moves;
+
+    int file = square.file();
+    int rank = square.rank();
+
+    for (int r = 0; r < 8; r++) {
+        if (r != rank) {
+            moves.push_back(Square(file, r));
+        }
+    }
+
+    for (int f = 0; f < 8; f++) {
+        if (f != file) {
+            moves.push_back(Square(f, rank));
+        }
+    }
+
+    return moves;
+}
 
 }

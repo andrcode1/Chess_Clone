@@ -33,7 +33,7 @@ bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
     int currentRank = rankFrom + rankDirection;
     
     while (currentFile != fileTo && currentRank != rankTo) {
-        if (position.getPieceAt(currentRank, currentFile) != nullptr) {
+        if (position.getPieceAt(currentFile, currentRank) != nullptr) {
             return false; // Path is blocked
         }
         currentFile += fileDirection;
@@ -41,6 +41,31 @@ bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
     }
 
     return true;
-}   
+}
+
+std::vector<Square> Bishop::getPseudoLegalMoves(const Square& square) const {
+    std::vector<Square> moves;
+    
+    int file = square.file();
+    int rank = square.rank();
+    
+    int directions[4][2] = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
+    
+    for (auto& dir : directions) {
+        int fileDir = dir[0];
+        int rankDir = dir[1];
+        
+        int currentFile = file + fileDir;
+        int currentRank = rank + rankDir;
+        
+        while ((currentFile >= 0 && currentFile < 8) && (currentRank >= 0 && currentRank < 8)) {
+            moves.push_back(Square(currentFile, currentRank));
+            currentFile += fileDir;
+            currentRank += rankDir;
+        }
+    }
+    
+    return moves;
+}
 
 }

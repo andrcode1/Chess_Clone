@@ -46,7 +46,7 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
             }
             // Passing squares can not be occupied or attacked
             for (int file = 5; file <= 6; file++) {
-                Square square(rankFrom, file);
+                Square square(file, rankFrom);
                 if (position.isSquareAttacked(square, enemyColor) ||
                     position.getPieceAt(square) != nullptr) {
                     return false;
@@ -75,7 +75,7 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
             
             // Squares which King passes through can not be occupied or attacked
             for (int file = fileFrom; file >= 2; file--) {
-                Square square(rankFrom, file);
+                Square square(file, rankFrom);
                 if (position.isSquareAttacked(square, enemyColor) ||
                     position.getPieceAt(square) != nullptr) {
                     return false;
@@ -91,6 +91,30 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
     }
 
     return true;
-}   
+}
+
+std::vector<Square> King::getPseudoLegalMoves(const Square& square) const {
+    std::vector<Square> moves;
+    
+    int file = square.file();
+    int rank = square.rank();
+    
+    for (int fileOffset = -1; fileOffset <= 1; fileOffset++) {
+        for (int rankOffset = -1; rankOffset <= 1; rankOffset++) {
+            if (fileOffset == 0 && rankOffset == 0) {
+                continue;
+            }
+            
+            int newFile = file + fileOffset;
+            int newRank = rank + rankOffset;
+            
+            if ((newFile >= 0 && newFile < 8) && (newRank >= 0 && newRank < 8)) {
+                moves.push_back(Square(newFile, newRank));
+            }
+        }
+    }
+    
+    return moves;
+}
 
 }

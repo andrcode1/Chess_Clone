@@ -47,7 +47,7 @@ Position::Position(const Position& other)
 {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
-            Square currentSquare(rank, file);
+            Square currentSquare(file, rank);
             board_[rank][file] = clonePiece(other.board_[rank][file].get(), currentSquare);
         }
     }
@@ -59,7 +59,7 @@ Color Position::getSideToMove() const {
 const std::unique_ptr<Piece>& Position::getPieceAt(Square square) const { 
     return board_[square.rank()][square.file()]; 
 }
-const std::unique_ptr<Piece>& Position::getPieceAt(int rank, int file) const { 
+const std::unique_ptr<Piece>& Position::getPieceAt(int file, int rank) const { 
     return board_[rank][file]; 
 }
 int Position::getHalfmoveClock() const {

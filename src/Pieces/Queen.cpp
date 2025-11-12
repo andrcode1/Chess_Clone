@@ -49,6 +49,45 @@ bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const 
     }
 
     return true;
-}   
+}
+
+std::vector<Square> Queen::getPseudoLegalMoves(const Square& square) const {
+    std::vector<Square> moves;
+
+    int file = square.file();
+    int rank = square.rank();
+
+    // Rook-like moves
+    for (int r = 0; r < 8; r++) {
+        if (r != rank) {
+            moves.push_back(Square(file, r));
+        }
+    }
+
+    for (int f = 0; f < 8; f++) {
+        if (f != file) {
+            moves.push_back(Square(f, rank));
+        }
+    }
+
+    // Bishop-like moves
+    int directions[4][2] = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
+    
+    for (auto& dir : directions) {
+        int fileDir = dir[0];
+        int rankDir = dir[1];
+        
+        int currentFile = file + fileDir;
+        int currentRank = rank + rankDir;
+        
+        while ((currentFile >= 0 && currentFile < 8) && (currentRank >= 0 && currentRank < 8)) {
+            moves.push_back(Square(currentFile, currentRank));
+            currentFile += fileDir;
+            currentRank += rankDir;
+        }
+    }
+    
+    return moves;
+}
 
 }
