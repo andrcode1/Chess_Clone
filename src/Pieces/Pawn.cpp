@@ -17,7 +17,52 @@ bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const {
     int fileTo = move.squareTo.file();
     int rankTo = move.squareTo.rank();
 
-    // TODO: 1 move forward OR capturing enemy piece OR en passant -> Requires Position class
+    int direction = (pieceColor_ == Color::WHITE) ? 1 : -1;
+    int startingRank = (pieceColor_ == Color::WHITE) ? 1 : 6;
+    
+    int rankDiff = rankTo - rankFrom;
+    int fileDiff = std::abs(fileTo - fileFrom);
+    
+    if ((rankDiff == 2 * direction) && (fileDiff == 0)) {
+        if (rankFrom != startingRank) {
+            return false;
+        }
+        
+        int middleRank = rankFrom + direction;
+        if (position.getPieceAt(middleRank, fileFrom) != nullptr ||
+            position.getPieceAt(rankTo, fileTo) != nullptr) {
+            return false;
+        }
+        return true;
+    }
+    
+    if ((rankDiff == direction) && (fileDiff == 0)) {
+        if (position.getPieceAt(rankTo, fileTo) != nullptr) {
+            return false;
+        }
+        return true;
+    }
+    
+    // Captures
+    if (rankDiff == direction && fileDiff == 1) {
+        const auto& capturedPiece = position.getPieceAt(rankTo, fileTo);
+        
+        // Check if there's an enemy piece to capture and that it is an enemy piece
+        if ((capturedPiece != nullptr) && (capturedPiece->getColor() != pieceColor_)) {
+            return true;
+        }
+        
+        // Check for en passant
+        Square enPassantTarget = position.getEnPassantTarget();
+        if (enPassantTarget.rank() != -1 && enPassantTarget.file() != -1) {
+            if (enPassantTarget == move.squareTo) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    return false;
 }
 
 }

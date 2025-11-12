@@ -42,19 +42,14 @@ Position::Position(const Position& other)
       halfmoveClock_(other.halfmoveClock_),
       fullmoveCounter_(other.fullmoveCounter_),
       whitePieces_(other.whitePieces_),
-      blackPieces_(other.blackPieces_)
+      blackPieces_(other.blackPieces_),
+      enPassantTarget_(other.enPassantTarget_)
 {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             Square currentSquare(rank, file);
             board_[rank][file] = clonePiece(other.board_[rank][file].get(), currentSquare);
         }
-    }
-    
-    if (other.enPassantTarget_ != nullptr) {
-        enPassantTarget_ = std::make_unique<Square>(*other.enPassantTarget_);
-    } else {
-        enPassantTarget_ = nullptr;
     }
 }
 
@@ -72,6 +67,12 @@ int Position::getHalfmoveClock() const {
 }
 int Position::getFullmoveCounter() const {
     return fullmoveCounter_;
+}
+const CastlingRights& Position::getCastlingRights() const {
+    return castlingRights_;
+}
+Square Position::getEnPassantTarget() const {
+    return enPassantTarget_;
 }
 
 void Position::setSideToMove(Color side) {
@@ -190,11 +191,11 @@ void Position::makeMove(const Move& move) {
     // If king moves, lose both castling rights for that color
     if (movedPiece->getType() == PieceType::KING) {
         if (movedPiece->getColor() == Color::WHITE) {
-            newPosition.castlingRights_.whiteKingside = false;
-            newPosition.castlingRights_.whiteQueenside = false;
+            newPosition.castlingRights_.whiteKingSide = false;
+            newPosition.castlingRights_.whiteQueenSide = false;
         } else {
-            newPosition.castlingRights_.blackKingside = false;
-            newPosition.castlingRights_.blackQueenside = false;
+            newPosition.castlingRights_.blackKingSide = false;
+            newPosition.castlingRights_.blackQueenSide = false;
         }
     }
     
@@ -202,15 +203,15 @@ void Position::makeMove(const Move& move) {
     if (movedPiece->getType() == PieceType::ROOK) {
         if (movedPiece->getColor() == Color::WHITE) {
             if (move.squareFrom.rank() == 0 && move.squareFrom.file() == 0) {
-                newPosition.castlingRights_.whiteQueenside = false;
+                newPosition.castlingRights_.whiteQueenSide = false;
             } else if (move.squareFrom.rank() == 0 && move.squareFrom.file() == 7) {
-                newPosition.castlingRights_.whiteKingside = false;
+                newPosition.castlingRights_.whiteKingSide = false;
             }
         } else {
             if (move.squareFrom.rank() == 7 && move.squareFrom.file() == 0) {
-                newPosition.castlingRights_.blackQueenside = false;
+                newPosition.castlingRights_.blackQueenSide = false;
             } else if (move.squareFrom.rank() == 7 && move.squareFrom.file() == 7) {
-                newPosition.castlingRights_.blackKingside = false;
+                newPosition.castlingRights_.blackKingSide = false;
             }
         }
     }
@@ -219,26 +220,26 @@ void Position::makeMove(const Move& move) {
     if (capturedPiece != nullptr && capturedPiece->getType() == PieceType::ROOK) {
         if (capturedPiece->getColor() == Color::WHITE) {
             if (move.squareTo.rank() == 0 && move.squareTo.file() == 0) {
-                newPosition.castlingRights_.whiteQueenside = false;
+                newPosition.castlingRights_.whiteQueenSide = false;
             } else if (move.squareTo.rank() == 0 && move.squareTo.file() == 7) {
-                newPosition.castlingRights_.whiteKingside = false;
+                newPosition.castlingRights_.whiteKingSide = false;
             }
         } else {
             if (move.squareTo.rank() == 7 && move.squareTo.file() == 0) {
-                newPosition.castlingRights_.blackQueenside = false;
+                newPosition.castlingRights_.blackQueenSide = false;
             } else if (move.squareTo.rank() == 7 && move.squareTo.file() == 7) {
-                newPosition.castlingRights_.blackKingside = false;
+                newPosition.castlingRights_.blackKingSide = false;
             }
         }
     }
     
     // If pawn moves two squares, set en passant target
-    newPosition.enPassantTarget_ = nullptr;
+    newPosition.enPassantTarget_ = Square(-1, -1);
     if (movedPiece->getType() == PieceType::PAWN) {
         int rankDiff = std::abs(move.squareTo.rank() - move.squareFrom.rank());
         if (rankDiff == 2) {
             int enPassantRank = (move.squareFrom.rank() + move.squareTo.rank()) / 2;
-            newPosition.enPassantTarget_ = std::make_unique<Square>(enPassantRank, move.squareFrom.file());
+            newPosition.enPassantTarget_ = Square(move.squareFrom.file(), enPassantRank);
         }
     }
     

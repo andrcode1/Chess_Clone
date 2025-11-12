@@ -6,6 +6,16 @@
 namespace chessboard
 {
 
+struct CastlingRights {
+    bool whiteKingSide {true};
+    bool whiteQueenSide {true};
+    bool blackKingSide {true};
+    bool blackQueenSide {true};
+    
+    CastlingRights() = default;
+    ~CastlingRights() = default;
+};
+
 class Position
 {
 private:
@@ -14,17 +24,9 @@ private:
     std::vector<Square> blackPieces_;
     Color sideToMove_;
 
-    struct CastlingRights {
-        bool whiteKingside {true};
-        bool whiteQueenside {true};
-        bool blackKingside {true};
-        bool blackQueenside {true};
-        
-        CastlingRights() = default;
-        ~CastlingRights() = default;
-    } castlingRights_;
+    CastlingRights castlingRights_;
     
-    std::unique_ptr<Square> enPassantTarget_;
+    Square enPassantTarget_;
     int halfmoveClock_;
     int fullmoveCounter_;
     
@@ -35,7 +37,7 @@ public:
     : sideToMove_(Color::WHITE), 
       halfmoveClock_(0), 
       fullmoveCounter_(1),
-      enPassantTarget_(nullptr)
+      enPassantTarget_(-1, -1)
     {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -51,6 +53,8 @@ public:
     const std::unique_ptr<Piece>& getPieceAt(int rank, int file) const;
     int getHalfmoveClock() const;
     int getFullmoveCounter() const;
+    const CastlingRights& getCastlingRights() const;
+    Square getEnPassantTarget() const;
     
     
     void setSideToMove(Color side);

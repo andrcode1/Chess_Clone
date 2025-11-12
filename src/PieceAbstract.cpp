@@ -5,7 +5,7 @@ namespace chessboard
 
 Color Piece::getColor() const
 {
-    return color_;
+    return pieceColor_;
 }
 Square Piece::getPosition() const
 {
