@@ -7,8 +7,8 @@ PieceType King::getType() const {
     return PieceType::KING;
 }
 
-std::string King::getSymbol() const {
-    return "K";
+char King::getSymbol() const {
+    return 'K';
 }
 
 bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
@@ -41,7 +41,7 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
             }
             
             // Can't castle from check
-            if (position.kingInCheck(pieceColor_)) {
+            if (position.isKingInCheck(pieceColor_)) {
                     return false;
             }
             // Passing squares can not be occupied or attacked
@@ -65,11 +65,11 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const {
             }
             
             // Can't castle from check
-            if (position.kingInCheck(pieceColor_)) {
+            if (position.isKingInCheck(pieceColor_)) {
                 return false;
             }
             // Square which Rook passes through can not be occupied
-            if ( position.getPieceAt(rankFrom, 1) != nullptr) {
+            if (position.getPieceAt(rankFrom, 1) != nullptr) {
                 return false;
             }
             

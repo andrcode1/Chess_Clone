@@ -7,6 +7,10 @@ PieceType Pawn::getType() const {
     return PieceType::PAWN;
 }
 
+char Pawn::getSymbol() const {
+    return 'P';
+}
+
 int Pawn::getValue() const {
     return 1;
 }

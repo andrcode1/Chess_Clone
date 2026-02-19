@@ -21,7 +21,7 @@ public:
     virtual bool isPseudoLegalMove(const Move& move, const Position& position) const = 0;
     virtual std::vector<Square> getPseudoLegalMoves(const Square& square) const = 0;
     virtual PieceType getType() const = 0;
-    virtual std::string getSymbol() const = 0;
+    virtual char getSymbol() const = 0;
     virtual int getValue() const = 0;
     
     Color getColor() const;

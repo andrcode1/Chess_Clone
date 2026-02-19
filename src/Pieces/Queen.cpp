@@ -7,8 +7,8 @@ PieceType Queen::getType() const {
     return PieceType::QUEEN;
 }
 
-std::string Queen::getSymbol() const {
-    return "Q";
+char Queen::getSymbol() const {
+    return 'Q';
 }
 
 int Queen::getValue() const {

@@ -7,8 +7,8 @@ PieceType Knight::getType() const {
     return PieceType::KNIGHT;
 }
 
-std::string Knight::getSymbol() const {
-    return "N";
+char Knight::getSymbol() const {
+    return 'N';
 }
 
 int Knight::getValue() const {

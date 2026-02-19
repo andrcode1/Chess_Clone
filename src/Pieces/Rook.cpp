@@ -7,8 +7,8 @@ PieceType Rook::getType() const {
     return PieceType::ROOK;
 }
 
-std::string Rook::getSymbol() const {
-    return "R";
+char Rook::getSymbol() const {
+    return 'R';
 }
 
 int Rook::getValue() const {

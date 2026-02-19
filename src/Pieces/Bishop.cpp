@@ -7,8 +7,8 @@ PieceType Bishop::getType() const {
     return PieceType::BISHOP;
 }
 
-std::string Bishop::getSymbol() const {
-    return "B";
+char Bishop::getSymbol() const {
+    return 'B';
 }
 
 int Bishop::getValue() const {

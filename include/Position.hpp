@@ -27,15 +27,15 @@ private:
     CastlingRights castlingRights_;
     
     Square enPassantTarget_;
-    int halfmoveClock_;
+    int halfMoveClock_;
     int fullmoveCounter_;
     
     static std::unique_ptr<Piece> clonePiece(const Piece* piece, Square position);
 
 public:
-    Position() 
-    : sideToMove_(Color::WHITE), 
-      halfmoveClock_(0), 
+    Position()
+    : sideToMove_(Color::WHITE),
+      halfMoveClock_(0),
       fullmoveCounter_(1),
       enPassantTarget_(-1, -1)
     {
@@ -59,15 +59,23 @@ public:
     
     void setSideToMove(Color side);
     void setPieceAt(int rank, int file, std::unique_ptr<Piece> piece);
+    int newHalfMoveClock(const std::unique_ptr<chessboard::Piece>& movedPiece,
+                         const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece);
+    CastlingRights newCastlingRights(const std::unique_ptr<chessboard::Piece>& movedPiece,
+                                     const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece,
+                                     const Move& move,
+                                     const CastlingRights& currentRights) const;
 
     bool isSquareAttacked(const Square squareTo, Color sideToMove) const;
-    bool kingInCheck(Color side) const;
-    Position boardAfterMove(const Move& move) const;
-    bool isLegalMove(const Move& move, const Position& position) const;
-    void makeMove(const Move& move);
-    bool hasLegalMove();
-    bool isCheckmate();
-    bool isStalemate();
+    bool isKingInCheck(Color side) const;
+    void updateBoard(const Move& move);
+    bool isLegalMove(const Move& move, const Position& positionAfterMove) const;
+    Position makeMove(const Move& move);
+    bool hasLegalMove(Color sideToCheck) const;
+    bool isCheckmate(Color sideToCheck);
+    bool isDrawByStalemate(Color sideToCheck);
+    bool isDrawByInsufficientMaterial();
+    bool isDrawByHalfMoveClock();
     bool isDraw();
     std::string getFEN() const;
     void setFromFEN(const std::string& fen);
