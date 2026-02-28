@@ -1,4 +1,5 @@
 #include "../../include/Pieces/King.hpp"
+#include "../../include/Position.hpp"
 
 namespace chessboard
 {
@@ -9,6 +10,9 @@ PieceType King::getType() const {
 
 char King::getSymbol() const {
     return 'K';
+}
+int King::getValue() const {
+    return 0; // King has no material value
 }
 
 bool King::isPseudoLegalMove(const Move& move, const Position& position) const {

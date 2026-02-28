@@ -1,4 +1,5 @@
 #include "../../include/Pieces/Rook.hpp"
+#include "../../include/Position.hpp"
 
 namespace chessboard
 {
@@ -25,7 +26,7 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const {
     bool isSameRank = (rankFrom == rankTo);
 
     if (!isSameFile && !isSameRank) {
-        return false; // Illegal move
+        return false;
     }
 
     if (isSameFile) {

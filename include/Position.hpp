@@ -47,6 +47,8 @@ public:
     }
     
     Position(const Position& other);
+    Position(Position&&) = default;
+    Position& operator=(Position&&) = default;
 
     Color getSideToMove() const;
     const std::unique_ptr<Piece>& getPieceAt(Square square) const;
@@ -77,6 +79,7 @@ public:
     bool isDrawByInsufficientMaterial();
     bool isDrawByHalfMoveClock();
     bool isDraw();
+    std::string getBoardFEN() const;
     std::string getFEN() const;
     void setFromFEN(const std::string& fen);
 };

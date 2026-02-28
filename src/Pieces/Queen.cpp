@@ -1,4 +1,5 @@
 #include "../../include/Pieces/Queen.hpp"
+#include "../../include/Position.hpp"
 
 namespace chessboard
 {
@@ -21,7 +22,6 @@ bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const 
     int fileTo = move.squareTo.file();
     int rankTo = move.squareTo.rank();
 
-    // Calculate direction of movement (0 for no movement, -1 or +1 for direction)
     int fileDirection = 0;
     if (fileTo > fileFrom) {fileDirection = 1;}
     else if (fileTo < fileFrom) {fileDirection = -1;}
@@ -34,7 +34,7 @@ bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const 
     bool isStraight = (fileDirection == 0 || rankDirection == 0);
     
     if (!isDiagonal && !isStraight) {
-        return false; // Illegal move
+        return false;
     }
 
     int currentFile = fileFrom + fileDirection;

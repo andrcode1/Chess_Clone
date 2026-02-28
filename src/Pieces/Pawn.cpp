@@ -1,4 +1,5 @@
 #include "../../include/Pieces/Pawn.hpp"
+#include "../../include/Position.hpp"
 
 namespace chessboard
 {

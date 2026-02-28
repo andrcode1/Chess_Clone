@@ -1,10 +1,5 @@
 #include "../include/Position.hpp"
-#include "../include/Pieces/Pawn.hpp"
-#include "../include/Pieces/Knight.hpp"
-#include "../include/Pieces/Bishop.hpp"
-#include "../include/Pieces/Rook.hpp"
-#include "../include/Pieces/Queen.hpp"
-#include "../include/Pieces/King.hpp"
+#include "../include/PieceFactory.hpp"
 #include "../include/exceptions/IllegalMoveException.hpp"
 #include <sstream>
 #include <algorithm>
@@ -17,25 +12,7 @@ std::unique_ptr<Piece> Position::clonePiece(const Piece* piece, Square position)
     if (piece == nullptr) {
         return nullptr;
     }
-    
-    Color pieceColor = piece->getColor();
-    
-    switch (piece->getType()) {
-        case PieceType::PAWN:
-            return std::make_unique<Pawn>(pieceColor, position);
-        case PieceType::KNIGHT:
-            return std::make_unique<Knight>(pieceColor, position);
-        case PieceType::BISHOP:
-            return std::make_unique<Bishop>(pieceColor, position);
-        case PieceType::ROOK:
-            return std::make_unique<Rook>(pieceColor, position);
-        case PieceType::QUEEN:
-            return std::make_unique<Queen>(pieceColor, position);
-        case PieceType::KING:
-            return std::make_unique<King>(pieceColor, position);
-        default:
-            return nullptr;
-    }
+    return PieceFactory::create(piece->getType(), piece->getColor(), position);
 }
 
 Position::Position(const Position& other)
@@ -353,13 +330,16 @@ bool Position::isDrawByInsufficientMaterial() {
     return false;
 }
 
+bool Position::isDrawByHalfMoveClock() {
+    return (halfMoveClock_ >= 50 );
+}
+
 bool Position::isDraw() {
     return isDrawByStalemate(sideToMove_) || isDrawByInsufficientMaterial() || isDrawByHalfMoveClock();
 }
 
-std::string Position::getFEN() const {
+std::string Position::getBoardFEN() const {
     std::string fen;
-
     for (int rank = 7; rank >= 0; rank--) {
         int emptyCounter = 0;
         for (int file = 0; file < 8; file++) {
@@ -388,7 +368,13 @@ std::string Position::getFEN() const {
             fen += "/";
         }
     }
-    fen += " ";
+}
+
+std::string Position::getFEN() const {
+    std::string fen;
+    
+    std::string boardFen = getBoardFEN();
+    fen += boardFen + " ";
 
     fen += (sideToMove_ == Color::WHITE) ? "w" : "b";
     fen += " ";
@@ -443,27 +429,7 @@ void Position::setFromFEN(const std::string& fen) {
             char pieceChar = std::toupper(c);
             Square position(file, rank);
             
-            std::unique_ptr<Piece> piece;
-            switch (pieceChar) {
-                case 'P':
-                    piece = std::make_unique<Pawn>(color, position);
-                    break;
-                case 'N':
-                    piece = std::make_unique<Knight>(color, position);
-                    break;
-                case 'B':
-                    piece = std::make_unique<Bishop>(color, position);
-                    break;
-                case 'R':
-                    piece = std::make_unique<Rook>(color, position);
-                    break;
-                case 'Q':
-                    piece = std::make_unique<Queen>(color, position);
-                    break;
-                case 'K':
-                    piece = std::make_unique<King>(color, position);
-                    break;
-            }
+            std::unique_ptr<Piece> piece = PieceFactory::fromFENChar(pieceChar, color, position);
             
             if (piece) {
                 board_[rank][file] = std::move(piece);

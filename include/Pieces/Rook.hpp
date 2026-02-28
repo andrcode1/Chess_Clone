@@ -8,7 +8,7 @@ namespace chessboard
 class Rook : public Piece
 {
 public:
-    Rook(Color color, Square position);
+    Rook(Color color, Square position) : Piece(color, position) {}
     ~Rook() override = default;
     
     PieceType getType() const override;

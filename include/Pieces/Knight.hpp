@@ -8,7 +8,7 @@ namespace chessboard
 class Knight : public Piece
 {
 public:
-    Knight(Color color, Square position);
+    Knight(Color color, Square position) : Piece(color, position) {}
     ~Knight() override = default;
     
     PieceType getType() const override;

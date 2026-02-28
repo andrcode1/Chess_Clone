@@ -1,4 +1,5 @@
 #include "../../include/Pieces/Bishop.hpp"
+#include "../../include/Position.hpp"
 
 namespace chessboard
 {
@@ -22,7 +23,7 @@ bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
     int rankTo = move.squareTo.rank();
 
     if (std::abs(fileFrom - fileTo) != std::abs(rankFrom - rankTo)) {
-        return false; // Illegal move: Not diagonal
+        return false;
     }
 
     // Calculate direction of movement

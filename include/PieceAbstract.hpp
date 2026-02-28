@@ -1,11 +1,15 @@
 #pragma once
 
-#include "Position.hpp"
+#include "ChessCore.hpp"
+#include "Square.hpp"
+#include "Move.hpp"
 #include <vector>
 #include <memory>
 
 namespace chessboard
 {
+
+class Position; // for isPseudoLegalMove()
 
 class Piece
 {
