@@ -1,6 +1,6 @@
-#include "../include/Position.hpp"
-#include "../include/PieceFactory.hpp"
-#include "../include/exceptions/IllegalMoveException.hpp"
+#include "../../include/chess/core/Position.hpp"
+#include "../../include/chess/pieces/PieceFactory.hpp"
+#include "../../include/chess/exceptions/IllegalMoveException.hpp"
 #include <sstream>
 #include <algorithm>
 #include <cctype>

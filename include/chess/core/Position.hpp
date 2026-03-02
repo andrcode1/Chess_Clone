@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Move.hpp"
-#include "PieceAbstract.hpp"
+#include "../pieces/Piece.hpp"
 
 namespace chessboard
 {

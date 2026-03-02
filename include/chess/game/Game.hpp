@@ -1,8 +1,8 @@
 #include <vector>
 #include <unordered_map>
-#include "Position.hpp"
-#include "Move.hpp"
-#include "ChessCore.hpp"
+#include "../core/Position.hpp"
+#include "../core/Move.hpp"
+#include "../core/Enums.hpp"
 
 namespace chessboard
 {

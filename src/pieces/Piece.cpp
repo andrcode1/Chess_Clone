@@ -1,4 +1,4 @@
-#include "../include/PieceAbstract.hpp"
+#include "../../include/chess/pieces/Piece.hpp"
 
 namespace chessboard
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Square.hpp"
-#include "ChessCore.hpp"
+#include "Enums.hpp"
 
 namespace chessboard
 {

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../../include/PieceAbstract.hpp"
+#include "Piece.hpp"
 
 namespace chessboard
 {
 
-class King : public Piece
+class Knight : public Piece
 {
 public:
-    King(Color color, Square position) : Piece(color, position) {}
-    ~King() override = default;
+    Knight(Color color, Square position) : Piece(color, position) {}
+    ~Knight() override = default;
     
     PieceType getType() const override;
     char getSymbol() const override;
