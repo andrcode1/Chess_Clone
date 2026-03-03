@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../core/Enums.hpp"
-#include "../core/Square.hpp"
-#include "../core/Move.hpp"
+#include "chess/core/Enums.hpp"
+#include "chess/core/Square.hpp"
+#include "chess/core/Move.hpp"
 #include <vector>
 #include <memory>
 

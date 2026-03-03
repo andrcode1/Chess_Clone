@@ -1,6 +1,6 @@
-#include "../../include/chess/core/Position.hpp"
-#include "../../include/chess/pieces/PieceFactory.hpp"
-#include "../../include/chess/exceptions/IllegalMoveException.hpp"
+#include "chess/core/Position.hpp"
+#include "chess/pieces/PieceFactory.hpp"
+#include "chess/exceptions/IllegalMoveException.hpp"
 #include <sstream>
 #include <algorithm>
 #include <cctype>
@@ -368,6 +368,7 @@ std::string Position::getBoardFEN() const {
             fen += "/";
         }
     }
+    return fen;
 }
 
 std::string Position::getFEN() const {

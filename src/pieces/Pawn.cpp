@@ -1,5 +1,5 @@
-#include "../../include/chess/pieces/Pawn.hpp"
-#include "../../include/chess/core/Position.hpp"
+#include "chess/pieces/Pawn.hpp"
+#include "chess/core/Position.hpp"
 
 namespace chessboard
 {
