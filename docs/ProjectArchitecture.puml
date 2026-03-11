@@ -1,0 +1,156 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 160
+skinparam ranksep 60
+
+package "game" {
+    class Game {
+        - positionHistory_: vector<Position>
+        - positionCounts_: unordered_map<string, int>
+        - moveHistory_: vector<Move>
+        - viewedPositionIndex_: int
+        - result_: GameResult
+        + playMove(move: Move): void
+        + isDrawByThreefoldRepetition(newPosition: Position): bool
+        + goToMove(moveIndex: int): void
+        + goForward(): void
+        + goBack(): void
+        + getViewedPosition(): Position&
+        + getCurrentPosition(): Position&
+        + getResult(): GameResult
+        + isOver(): bool
+    }
+}
+
+package "core" {
+    enum PieceType {
+        PAWN
+        KNIGHT
+        BISHOP
+        ROOK
+        QUEEN
+        KING
+        NO_PIECE_TYPE
+    }
+
+    enum Color {
+        WHITE
+        BLACK
+        NO_COLOR
+    }
+
+    enum GameResult {
+        IN_PROGRESS
+        WHITE_WIN
+        BLACK_WIN
+        DRAW
+    }
+
+    class Square {
+        - file_: int
+        - rank_: int
+        + fromAlgebraic(algebraicForm: string): Square
+        + toAlgebraic(): string
+        + file(): int
+        + rank(): int
+    }
+
+    struct Move {
+        + squareFrom: Square
+        + squareTo: Square
+        + promotion: PieceType
+        + toAlgebraic(): string
+    }
+
+    struct CastlingRights {
+        + whiteKingSide: bool
+        + whiteQueenSide: bool
+        + blackKingSide: bool
+        + blackQueenSide: bool
+    }
+
+    class Position {
+        - board_: Piece[8][8]
+        - whitePieces_: vector<Square>
+        - blackPieces_: vector<Square>
+        - sideToMove_: Color
+        - castlingRights_: CastlingRights
+        - enPassantTarget_: Square
+        - halfMoveClock_: int
+        - fullmoveCounter_: int
+        + getSideToMove(): Color
+        + getPieceAt(square: Square): Piece&
+        + isKingInCheck(side: Color): bool
+        + makeMove(move: Move): Position
+        + hasLegalMove(sideToCheck: Color): bool
+        + isCheckmate(sideToCheck: Color): bool
+        + isDraw(): bool
+        + getFEN(): string
+        + setFromFEN(fen: string): void
+    }
+
+    together {
+        enum PieceType
+        enum Color
+        enum GameResult
+    }
+
+    together {
+        struct Move
+        struct CastlingRights
+        class Square
+    }
+
+    Move --> Square
+    Move --> PieceType
+    Position *-- CastlingRights
+    Position --> Square
+    Position --> Move
+    Position --> Color
+}
+
+package "pieces" {
+    abstract class Piece {
+        # pieceColor_: Color
+        # positionOfPiece_: Square
+        # hasMoved_: bool
+        + {abstract} isPseudoLegalMove(move: Move, position: Position): bool
+        + {abstract} getPseudoLegalMoves(square: Square): vector<Square>
+        + {abstract} getType(): PieceType
+        + {abstract} getSymbol(): char
+        + {abstract} getValue(): int
+        + getColor(): Color
+        + getPosition(): Square
+        + moveTo(destination: Square): void
+    }
+
+    class "Bishop | King | Knight | Pawn | Queen | Rook" as ConcretePieces <<concrete>>
+
+    class PieceFactory {
+        + {static} create(type: PieceType, color: Color, position: Square): unique_ptr<Piece>
+        + {static} fromFENChar(pieceChar: char, color: Color, position: Square): unique_ptr<Piece>
+    }
+
+    Piece <|-- ConcretePieces
+
+    PieceFactory ..> Piece : <<creates>>
+}
+
+' Cross-package relationships
+Game --> Position
+Game --> Move
+Game --> GameResult
+
+Position --> Piece
+
+Piece --> Square
+Piece --> Color
+Piece --> Move
+
+PieceFactory --> PieceType
+PieceFactory --> Color
+PieceFactory --> Square
+
+@enduml
