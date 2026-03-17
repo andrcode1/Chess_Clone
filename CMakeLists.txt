@@ -23,3 +23,8 @@ set(SOURCES
 add_executable(chess ${SOURCES})
 
 target_include_directories(chess PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
