@@ -8,11 +8,11 @@
 namespace chessboard
 {
 
-std::unique_ptr<Piece> Position::clonePiece(const Piece* piece, Square position) {
+std::unique_ptr<Piece> Position::clonePiece(const Piece* piece) {
     if (piece == nullptr) {
         return nullptr;
     }
-    return PieceFactory::create(piece->getType(), piece->getColor(), position);
+    return PieceFactory::create(piece->getType(), piece->getColor());
 }
 
 Position::Position(const Position& other)
@@ -26,8 +26,7 @@ Position::Position(const Position& other)
 {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
-            Square currentSquare(file, rank);
-            board_[rank][file] = clonePiece(other.board_[rank][file].get(), currentSquare);
+            board_[rank][file] = clonePiece(other.board_[rank][file].get());
         }
     }
 }
@@ -69,7 +68,7 @@ bool Position::isSquareAttacked(const Square squareTo, Color sideToMove) const {
     for (const Square& squareFrom : attackingPieces) {
         const auto& piece = getPieceAt(squareFrom);
         if (piece != nullptr) {
-            Move potentialMove(squareFrom, squareTo);
+            Move potentialMove(squareFrom, squareTo, piece->getType());
             if (piece->isPseudoLegalMove(potentialMove, *this)) {
                 return true;
             }
@@ -86,7 +85,7 @@ bool Position::isKingInCheck(Color sideToCheck) const {
     for (const Square& squareFrom : vectorOfPieces) {
         const auto& piece = getPieceAt(squareFrom);
         if (piece != nullptr && piece->getType() == PieceType::KING) {
-            if(isSquareAttacked(piece->getPosition(), enemyColor)) {
+            if(isSquareAttacked(squareFrom, enemyColor)) {
                 return true;
             }
         }
@@ -101,10 +100,6 @@ void Position::updateBoard(const Move& move) {
     int toFile = move.squareTo.file();
     
     board_[toRank][toFile] = std::move(board_[fromRank][fromFile]);
-    
-    if (board_[toRank][toFile] != nullptr) {
-        board_[toRank][toFile]->moveTo(move.squareTo);
-    }
     
     Color movedPieceColor = getPieceAt(move.squareTo)->getColor();
     std::vector<Square>& movingPieces = (movedPieceColor == Color::WHITE)
@@ -156,12 +151,17 @@ Position Position::makeMove(const Move& move) {
     const auto& movedPiece = getPieceAt(move.squareFrom);
     const auto& capturedPiece = getPieceAt(move.squareTo);
     
-    newPosition.halfMoveClock_ = newHalfMoveClock(movedPiece, capturedPiece);
-    newPosition.castlingRights_ = newCastlingRights(movedPiece, capturedPiece, move, castlingRights_);
+    newPosition.halfMoveClock_ = newHalfMoveClock(move.movedPieceType, capturedPiece);
+    newPosition.castlingRights_ = newCastlingRights(
+        move.movedPieceType,
+        sideToMove_,
+        capturedPiece,
+        move,
+        castlingRights_);
     
     // If pawn moves two squares, set en passant target
     newPosition.enPassantTarget_ = Square(-1, -1);
-    if (movedPiece->getType() == PieceType::PAWN) {
+    if (move.movedPieceType == PieceType::PAWN) {
         int rankDiff = std::abs(move.squareTo.rank() - move.squareFrom.rank());
         if (rankDiff == 2) {
             int enPassantRank = (move.squareFrom.rank() + move.squareTo.rank()) / 2;
@@ -181,10 +181,10 @@ Position Position::makeMove(const Move& move) {
 }
 
 int Position::newHalfMoveClock(
-    const std::unique_ptr<chessboard::Piece>& movedPiece,
+    PieceType movedPieceType,
     const std::unique_ptr<chessboard::Piece>& capturedPiece)
     {
-    if (movedPiece->getType() == PieceType::PAWN || capturedPiece != nullptr) {
+    if (movedPieceType == PieceType::PAWN || capturedPiece != nullptr) {
         return 0;
     } else {
         return halfMoveClock_ + 1;
@@ -192,7 +192,8 @@ int Position::newHalfMoveClock(
 }
 
 CastlingRights Position::newCastlingRights(
-    const std::unique_ptr<chessboard::Piece>& movedPiece,
+    PieceType movedPieceType,
+    Color movedPieceColor,
     const std::unique_ptr<chessboard::Piece>& capturedPiece,
     const Move& move,
     const CastlingRights& currentRights) const
@@ -200,8 +201,8 @@ CastlingRights Position::newCastlingRights(
     CastlingRights newRights = currentRights;
 
     // If king moves, lose both castling rights for that color
-    if (movedPiece->getType() == PieceType::KING) {
-        if (movedPiece->getColor() == Color::WHITE) {
+    if (movedPieceType == PieceType::KING) {
+        if (movedPieceColor == Color::WHITE) {
             newRights.whiteKingSide = false;
             newRights.whiteQueenSide = false;
         } else {
@@ -211,8 +212,8 @@ CastlingRights Position::newCastlingRights(
     }
     
     // If rook moves from starting position, lose that side's castling right
-    if (movedPiece->getType() == PieceType::ROOK) {
-        if (movedPiece->getColor() == Color::WHITE) {
+    if (movedPieceType == PieceType::ROOK) {
+        if (movedPieceColor == Color::WHITE) {
             if (move.squareFrom.rank() == 0 && move.squareFrom.file() == 0) {
                 newRights.whiteQueenSide = false;
             } else if (move.squareFrom.rank() == 0 && move.squareFrom.file() == 7) {
@@ -256,7 +257,7 @@ bool Position::hasLegalMove(Color sideToCheck) const {
         if (piece != nullptr) {
             std::vector<Square> potentialSquaresTo = piece->getPseudoLegalMoves(squareFrom);
             for (const Square& squareTo : potentialSquaresTo) {
-                Move potentialMove{squareFrom, squareTo};
+                Move potentialMove{squareFrom, squareTo, piece->getType()};
                 Position testPosition(*this);
                 testPosition.updateBoard(potentialMove);
                 if (isLegalMove(potentialMove, testPosition)) {
@@ -430,7 +431,7 @@ void Position::setFromFEN(const std::string& fen) {
             char pieceChar = std::toupper(c);
             Square position(file, rank);
             
-            std::unique_ptr<Piece> piece = PieceFactory::fromFENChar(pieceChar, color, position);
+            std::unique_ptr<Piece> piece = PieceFactory::fromFENChar(pieceChar, color);
             
             if (piece) {
                 board_[rank][file] = std::move(piece);

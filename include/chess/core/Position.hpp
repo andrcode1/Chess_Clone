@@ -30,7 +30,7 @@ private:
     int halfMoveClock_;
     int fullmoveCounter_;
     
-    static std::unique_ptr<Piece> clonePiece(const Piece* piece, Square position);
+    static std::unique_ptr<Piece> clonePiece(const Piece* piece);
 
 public:
     Position()
@@ -61,9 +61,10 @@ public:
     
     void setSideToMove(Color side);
     void setPieceAt(int rank, int file, std::unique_ptr<Piece> piece);
-    int newHalfMoveClock(const std::unique_ptr<chessboard::Piece>& movedPiece,
+    int newHalfMoveClock(PieceType movedPieceType,
                          const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece);
-    CastlingRights newCastlingRights(const std::unique_ptr<chessboard::Piece>& movedPiece,
+    CastlingRights newCastlingRights(PieceType movedPieceType,
+                                     Color movedPieceColor,
                                      const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece,
                                      const Move& move,
                                      const CastlingRights& currentRights) const;

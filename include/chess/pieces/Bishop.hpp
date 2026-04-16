@@ -8,7 +8,7 @@ namespace chessboard
 class Bishop : public Piece
 {
 public:
-    Bishop(Color color, Square position) : Piece(color, position) {}
+    Bishop(Color color) : Piece(color) {}
     ~Bishop() override = default;
     
     PieceType getType() const override;

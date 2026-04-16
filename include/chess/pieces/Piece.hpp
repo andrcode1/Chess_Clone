@@ -3,23 +3,20 @@
 #include "chess/core/Enums.hpp"
 #include "chess/core/Square.hpp"
 #include "chess/core/Move.hpp"
+#include "chess/core/Position.fwd.hpp"
 #include <vector>
 #include <memory>
 
 namespace chessboard
 {
 
-class Position; // for isPseudoLegalMove()
-
 class Piece
 {
 protected:
     Color pieceColor_;
-    Square positionOfPiece_;
-    bool hasMoved_;
 
 public:
-    Piece(Color color, Square positionOfPiece) : pieceColor_(color), positionOfPiece_(positionOfPiece), hasMoved_(false) {};
+    Piece(Color color) : pieceColor_(color) {};
     virtual ~Piece() = default;
     
     virtual bool isPseudoLegalMove(const Move& move, const Position& position) const = 0;
@@ -29,8 +26,6 @@ public:
     virtual int getValue() const = 0;
     
     Color getColor() const;
-    Square getPosition() const;
-    void moveTo(Square destination);
 };
 
 } // namespace chessboard
