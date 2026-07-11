@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Move.hpp"
-#include "chess/pieces/Piece.hpp"
+#include "pieces/Piece.hpp"
+#include <vector>
 
 namespace chessboard
 {
@@ -45,7 +46,7 @@ public:
             }
         }
     }
-    
+
     Position(const Position& other);
     Position(Position&&) = default;
     Position& operator=(Position&&) = default;

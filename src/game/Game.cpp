@@ -1,6 +1,6 @@
-#include "chess/game/Game.hpp"
-#include "chess/core/Position.hpp"
-#include "chess/exceptions/IllegalMoveException.hpp"
+#include "game/Game.hpp"
+#include "core/Position.hpp"
+#include "exceptions/IllegalMoveException.hpp"
 #include <iostream>
 
 namespace chessboard

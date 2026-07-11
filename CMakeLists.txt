@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCES
     src/main.cpp
     src/core/Square.cpp
+    src/core/Move.cpp
     src/core/Position.cpp
     src/game/Game.cpp
     src/pieces/Piece.cpp

@@ -1,5 +1,5 @@
-#include "chess/pieces/King.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/King.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
@@ -8,9 +8,6 @@ PieceType King::getType() const {
     return PieceType::KING;
 }
 
-char King::getSymbol() const {
-    return 'K';
-}
 int King::getValue() const {
     return 0; // King has no material value
 }

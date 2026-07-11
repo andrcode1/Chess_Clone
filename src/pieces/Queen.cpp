@@ -1,15 +1,11 @@
-#include "chess/pieces/Queen.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/Queen.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
 
 PieceType Queen::getType() const {
     return PieceType::QUEEN;
-}
-
-char Queen::getSymbol() const {
-    return 'Q';
 }
 
 int Queen::getValue() const {

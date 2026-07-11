@@ -1,15 +1,11 @@
-#include "chess/pieces/Knight.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/Knight.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
 
 PieceType Knight::getType() const {
     return PieceType::KNIGHT;
-}
-
-char Knight::getSymbol() const {
-    return 'N';
 }
 
 int Knight::getValue() const {

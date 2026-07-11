@@ -1,15 +1,11 @@
-#include "chess/pieces/Rook.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/Rook.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
 
 PieceType Rook::getType() const {
     return PieceType::ROOK;
-}
-
-char Rook::getSymbol() const {
-    return 'R';
 }
 
 int Rook::getValue() const {

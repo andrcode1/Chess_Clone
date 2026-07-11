@@ -12,6 +12,7 @@ enable_testing()
 
 add_executable(chess_tests test_placeholder.cpp)
 target_link_libraries(chess_tests GTest::gtest_main)
+target_include_directories(chess_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 include(GoogleTest)
 gtest_discover_tests(chess_tests)

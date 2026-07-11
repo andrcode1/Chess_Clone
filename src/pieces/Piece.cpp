@@ -1,4 +1,5 @@
-#include "chess/pieces/Piece.hpp"
+#include "pieces/Piece.hpp"
+#include "core/PieceSymbols.hpp"
 
 namespace chessboard
 {
@@ -6,6 +7,11 @@ namespace chessboard
 Color Piece::getColor() const
 {
     return pieceColor_;
+}
+
+char Piece::getSymbol() const
+{
+    return pieceTypeToSymbol(getType());
 }
 
 } // namespace chessboard

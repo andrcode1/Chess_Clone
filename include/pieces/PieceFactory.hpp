@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Piece.hpp"
-#include "chess/core/Enums.hpp"
-#include "chess/core/Square.hpp"
+#include "core/Enums.hpp"
+#include "core/Square.hpp"
 #include <memory>
 
 namespace chessboard

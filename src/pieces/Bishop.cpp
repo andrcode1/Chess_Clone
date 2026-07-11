@@ -1,15 +1,11 @@
-#include "chess/pieces/Bishop.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/Bishop.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
 
 PieceType Bishop::getType() const {
     return PieceType::BISHOP;
-}
-
-char Bishop::getSymbol() const {
-    return 'B';
 }
 
 int Bishop::getValue() const {

@@ -1,15 +1,11 @@
-#include "chess/pieces/Pawn.hpp"
-#include "chess/core/Position.hpp"
+#include "pieces/Pawn.hpp"
+#include "core/Position.hpp"
 
 namespace chessboard
 {
 
 PieceType Pawn::getType() const {
     return PieceType::PAWN;
-}
-
-char Pawn::getSymbol() const {
-    return 'P';
 }
 
 int Pawn::getValue() const {

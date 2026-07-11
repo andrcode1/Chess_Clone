@@ -1,6 +1,6 @@
-#include "chess/core/Position.hpp"
-#include "chess/pieces/PieceFactory.hpp"
-#include "chess/exceptions/IllegalMoveException.hpp"
+#include "core/Position.hpp"
+#include "pieces/PieceFactory.hpp"
+#include "exceptions/IllegalMoveException.hpp"
 #include <sstream>
 #include <algorithm>
 #include <cctype>
@@ -100,8 +100,12 @@ void Position::updateBoard(const Move& move) {
     int toFile = move.squareTo.file();
     
     board_[toRank][toFile] = std::move(board_[fromRank][fromFile]);
-    
     Color movedPieceColor = getPieceAt(move.squareTo)->getColor();
+
+    if (move.promotion != PieceType::NO_PIECE_TYPE) {
+        board_[toRank][toFile] = PieceFactory::create(move.promotion, movedPieceColor);
+    }
+    
     std::vector<Square>& movingPieces = (movedPieceColor == Color::WHITE)
         ? whitePieces_ : blackPieces_;
     
@@ -137,6 +141,20 @@ bool Position::isLegalMove(const Move& move, const Position& positionAfterMove) 
     }
     if (!movedPiece->isPseudoLegalMove(move, *this)) {
         return false;
+    }
+
+    if (movedPiece->getType() == PieceType::PAWN) {
+        int promotionRank = (movedPiece->getColor() == Color::WHITE) ? 7 : 0;
+        bool reachesLastRank = (move.squareTo.rank() == promotionRank);
+        bool hasValidPromotionPiece =
+            move.promotion == PieceType::KNIGHT ||
+            move.promotion == PieceType::BISHOP ||
+            move.promotion == PieceType::ROOK  ||
+            move.promotion == PieceType::QUEEN;
+        if (reachesLastRank && !hasValidPromotionPiece || 
+            !reachesLastRank && hasValidPromotionPiece) {
+            return false;
+        }
     }
     
     return !positionAfterMove.isKingInCheck(getSideToMove());
@@ -254,15 +272,22 @@ bool Position::hasLegalMove(Color sideToCheck) const {
 
     for (const Square& squareFrom : vectorOfPieces) {
         const auto& piece = getPieceAt(squareFrom);
-        if (piece != nullptr) {
-            std::vector<Square> potentialSquaresTo = piece->getPseudoLegalMoves(squareFrom);
-            for (const Square& squareTo : potentialSquaresTo) {
-                Move potentialMove{squareFrom, squareTo, piece->getType()};
-                Position testPosition(*this);
-                testPosition.updateBoard(potentialMove);
-                if (isLegalMove(potentialMove, testPosition)) {
-                    return true;
+        if (piece == nullptr) {
+            continue;
+        }
+        std::vector<Square> potentialSquaresTo = piece->getPseudoLegalMoves(squareFrom);
+        for (const Square& squareTo : potentialSquaresTo) {
+            Move potentialMove{squareFrom, squareTo, piece->getType()};
+            if (piece->getType() == PieceType::PAWN) {
+                int promotionRank = (piece->getColor() == Color::WHITE) ? 7 : 0;
+                if (squareTo.rank() == promotionRank) { // promote to queen to test position
+                    potentialMove = Move(squareFrom, squareTo, piece->getType(), PieceType::QUEEN);  
                 }
+            }
+            Position testPosition(*this);
+            testPosition.updateBoard(potentialMove);
+            if (isLegalMove(potentialMove, testPosition)) {
+                return true;
             }
         }
     }

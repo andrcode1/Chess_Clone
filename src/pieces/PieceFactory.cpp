@@ -1,10 +1,10 @@
-#include "chess/pieces/PieceFactory.hpp"
-#include "chess/pieces/Pawn.hpp"
-#include "chess/pieces/Knight.hpp"
-#include "chess/pieces/Bishop.hpp"
-#include "chess/pieces/Rook.hpp"
-#include "chess/pieces/Queen.hpp"
-#include "chess/pieces/King.hpp"
+#include "pieces/PieceFactory.hpp"
+#include "pieces/Pawn.hpp"
+#include "pieces/Knight.hpp"
+#include "pieces/Bishop.hpp"
+#include "pieces/Rook.hpp"
+#include "pieces/Queen.hpp"
+#include "pieces/King.hpp"
 
 namespace chessboard
 {
