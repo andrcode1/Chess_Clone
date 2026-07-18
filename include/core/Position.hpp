@@ -38,13 +38,7 @@ public:
     Position()
         : sideToMove_(Color::WHITE), halfMoveClock_(0), fullmoveCounter_(1),
           enPassantTarget_(-1, -1)
-    {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                board_[i][j] = nullptr;
-            }
-        }
-    }
+    {}
 
     Position(const Position& other);
     Position(Position&&) = default;
