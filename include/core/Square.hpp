@@ -5,7 +5,7 @@
 namespace chessboard
 {
 
-class Square 
+class Square
 {
 private:
     int file_; // 0-7 (a-h)
@@ -13,18 +13,26 @@ private:
 
 public:
     Square(int file, int rank) : file_(file), rank_(rank) {}
-    
+
     static Square fromAlgebraic(const std::string& algebraicForm);
     std::string toAlgebraic() const;
-    
-    int file() const { return file_; }
-    int rank() const { return rank_; }
-    
-    bool operator==(const Square& other) const { 
-        return file_ == other.file_ && rank_ == other.rank_; 
+
+    int file() const
+    {
+        return file_;
     }
-    bool operator!=(const Square& other) const { 
-        return !(*this == other); 
+    int rank() const
+    {
+        return rank_;
+    }
+
+    bool operator==(const Square& other) const
+    {
+        return file_ == other.file_ && rank_ == other.rank_;
+    }
+    bool operator!=(const Square& other) const
+    {
+        return !(*this == other);
     }
 };
 

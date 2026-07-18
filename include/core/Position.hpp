@@ -7,12 +7,13 @@
 namespace chessboard
 {
 
-struct CastlingRights {
-    bool whiteKingSide {true};
-    bool whiteQueenSide {true};
-    bool blackKingSide {true};
-    bool blackQueenSide {true};
-    
+struct CastlingRights
+{
+    bool whiteKingSide{true};
+    bool whiteQueenSide{true};
+    bool blackKingSide{true};
+    bool blackQueenSide{true};
+
     CastlingRights() = default;
     ~CastlingRights() = default;
 };
@@ -26,19 +27,17 @@ private:
     Color sideToMove_;
 
     CastlingRights castlingRights_;
-    
+
     Square enPassantTarget_;
     int halfMoveClock_;
     int fullmoveCounter_;
-    
+
     static std::unique_ptr<Piece> clonePiece(const Piece* piece);
 
 public:
     Position()
-    : sideToMove_(Color::WHITE),
-      halfMoveClock_(0),
-      fullmoveCounter_(1),
-      enPassantTarget_(-1, -1)
+        : sideToMove_(Color::WHITE), halfMoveClock_(0), fullmoveCounter_(1),
+          enPassantTarget_(-1, -1)
     {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -58,17 +57,18 @@ public:
     int getFullmoveCounter() const;
     const CastlingRights& getCastlingRights() const;
     Square getEnPassantTarget() const;
-    
-    
+
     void setSideToMove(Color side);
     void setPieceAt(int rank, int file, std::unique_ptr<Piece> piece);
-    int newHalfMoveClock(PieceType movedPieceType,
-                         const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece);
-    CastlingRights newCastlingRights(PieceType movedPieceType,
-                                     Color movedPieceColor,
-                                     const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece,
-                                     const Move& move,
-                                     const CastlingRights& currentRights) const;
+    int newHalfMoveClock(
+        PieceType movedPieceType,
+        const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece);
+    CastlingRights newCastlingRights(
+        PieceType movedPieceType,
+        Color movedPieceColor,
+        const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece,
+        const Move& move,
+        const CastlingRights& currentRights) const;
 
     bool isSquareAttacked(const Square squareTo, Color sideToMove) const;
     bool isKingInCheck(Color side) const;

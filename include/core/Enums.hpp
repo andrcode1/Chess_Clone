@@ -2,7 +2,7 @@
 
 namespace chessboard
 {
-    
+
 enum class PieceType
 {
     PAWN,

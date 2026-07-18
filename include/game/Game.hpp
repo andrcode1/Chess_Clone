@@ -7,7 +7,8 @@
 namespace chessboard
 {
 
-class Game {
+class Game
+{
 private:
     std::vector<Position> positionHistory_;
     std::unordered_map<std::string, int> positionCounts_;
@@ -29,8 +30,14 @@ public:
     void goBack();
     Position& getViewedPosition();
     Position& getCurrentPosition();
-    GameResult getResult() const { return result_; }
-    bool isOver() const { return result_ != GameResult::IN_PROGRESS; }
+    GameResult getResult() const
+    {
+        return result_;
+    }
+    bool isOver() const
+    {
+        return result_ != GameResult::IN_PROGRESS;
+    }
 };
 
 } // namespace chessboard

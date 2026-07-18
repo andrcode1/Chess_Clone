@@ -4,15 +4,18 @@
 namespace chessboard
 {
 
-PieceType Rook::getType() const {
+PieceType Rook::getType() const
+{
     return PieceType::ROOK;
 }
 
-int Rook::getValue() const {
+int Rook::getValue() const
+{
     return 5;
 }
 
-bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const {
+bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const
+{
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
@@ -45,7 +48,8 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const {
     return true;
 }
 
-std::vector<Square> Rook::getPseudoLegalMoves(const Square& square) const {
+std::vector<Square> Rook::getPseudoLegalMoves(const Square& square) const
+{
     std::vector<Square> moves;
 
     int file = square.file();
@@ -66,4 +70,4 @@ std::vector<Square> Rook::getPseudoLegalMoves(const Square& square) const {
     return moves;
 }
 
-}
+} // namespace chessboard

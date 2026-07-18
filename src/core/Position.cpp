@@ -8,7 +8,8 @@
 namespace chessboard
 {
 
-std::unique_ptr<Piece> Position::clonePiece(const Piece* piece) {
+std::unique_ptr<Piece> Position::clonePiece(const Piece* piece)
+{
     if (piece == nullptr) {
         return nullptr;
     }
@@ -16,12 +17,9 @@ std::unique_ptr<Piece> Position::clonePiece(const Piece* piece) {
 }
 
 Position::Position(const Position& other)
-    : sideToMove_(other.sideToMove_),
-      castlingRights_(other.castlingRights_),
-      halfMoveClock_(other.halfMoveClock_),
-      fullmoveCounter_(other.fullmoveCounter_),
-      whitePieces_(other.whitePieces_),
-      blackPieces_(other.blackPieces_),
+    : sideToMove_(other.sideToMove_), castlingRights_(other.castlingRights_),
+      halfMoveClock_(other.halfMoveClock_), fullmoveCounter_(other.fullmoveCounter_),
+      whitePieces_(other.whitePieces_), blackPieces_(other.blackPieces_),
       enPassantTarget_(other.enPassantTarget_)
 {
     for (int rank = 0; rank < 8; rank++) {
@@ -31,39 +29,49 @@ Position::Position(const Position& other)
     }
 }
 
-Color Position::getSideToMove() const {
+Color Position::getSideToMove() const
+{
     return sideToMove_;
 }
-const std::unique_ptr<Piece>& Position::getPieceAt(Square square) const {
+const std::unique_ptr<Piece>& Position::getPieceAt(Square square) const
+{
     return board_[square.rank()][square.file()];
 }
-const std::unique_ptr<Piece>& Position::getPieceAt(int file, int rank) const {
+const std::unique_ptr<Piece>& Position::getPieceAt(int file, int rank) const
+{
     return board_[rank][file];
 }
-int Position::getHalfmoveClock() const {
+int Position::getHalfmoveClock() const
+{
     return halfMoveClock_;
 }
-int Position::getFullmoveCounter() const {
+int Position::getFullmoveCounter() const
+{
     return fullmoveCounter_;
 }
-const CastlingRights& Position::getCastlingRights() const {
+const CastlingRights& Position::getCastlingRights() const
+{
     return castlingRights_;
 }
-Square Position::getEnPassantTarget() const {
+Square Position::getEnPassantTarget() const
+{
     return enPassantTarget_;
 }
 
-void Position::setSideToMove(Color side) {
+void Position::setSideToMove(Color side)
+{
     sideToMove_ = side;
 }
 
-void Position::setPieceAt(int rank, int file, std::unique_ptr<Piece> piece) {
+void Position::setPieceAt(int rank, int file, std::unique_ptr<Piece> piece)
+{
     board_[rank][file] = std::move(piece);
 }
 
-bool Position::isSquareAttacked(const Square squareTo, Color sideToMove) const {
+bool Position::isSquareAttacked(const Square squareTo, Color sideToMove) const
+{
     const std::vector<Square>& attackingPieces =
-    (sideToMove == Color::WHITE) ? blackPieces_ : whitePieces_;
+        (sideToMove == Color::WHITE) ? blackPieces_ : whitePieces_;
 
     for (const Square& squareFrom : attackingPieces) {
         const auto& piece = getPieceAt(squareFrom);
@@ -77,15 +85,16 @@ bool Position::isSquareAttacked(const Square squareTo, Color sideToMove) const {
     return false;
 }
 
-bool Position::isKingInCheck(Color sideToCheck) const {
+bool Position::isKingInCheck(Color sideToCheck) const
+{
     const std::vector<Square>& vectorOfPieces =
-    (sideToCheck == Color::WHITE) ? whitePieces_ : blackPieces_;
+        (sideToCheck == Color::WHITE) ? whitePieces_ : blackPieces_;
     Color enemyColor = (sideToCheck == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
     for (const Square& squareFrom : vectorOfPieces) {
         const auto& piece = getPieceAt(squareFrom);
         if (piece != nullptr && piece->getType() == PieceType::KING) {
-            if(isSquareAttacked(squareFrom, enemyColor)) {
+            if (isSquareAttacked(squareFrom, enemyColor)) {
                 return true;
             }
         }
@@ -93,39 +102,40 @@ bool Position::isKingInCheck(Color sideToCheck) const {
     return false;
 }
 
-void Position::updateBoard(const Move& move) {
+void Position::updateBoard(const Move& move)
+{
     int fromRank = move.squareFrom.rank();
     int fromFile = move.squareFrom.file();
     int toRank = move.squareTo.rank();
     int toFile = move.squareTo.file();
-    
+
     board_[toRank][toFile] = std::move(board_[fromRank][fromFile]);
     Color movedPieceColor = getPieceAt(move.squareTo)->getColor();
 
     if (move.promotion != PieceType::NO_PIECE_TYPE) {
         board_[toRank][toFile] = PieceFactory::create(move.promotion, movedPieceColor);
     }
-    
-    std::vector<Square>& movingPieces = (movedPieceColor == Color::WHITE)
-        ? whitePieces_ : blackPieces_;
-    
+
+    std::vector<Square>& movingPieces =
+        (movedPieceColor == Color::WHITE) ? whitePieces_ : blackPieces_;
+
     for (auto& square : movingPieces) {
         if (square == move.squareFrom) {
             square = move.squareTo;
             break;
         }
     }
-    
-    std::vector<Square>& opponentPieces = (movedPieceColor == Color::WHITE)
-        ? blackPieces_ : whitePieces_;
-    
+
+    std::vector<Square>& opponentPieces =
+        (movedPieceColor == Color::WHITE) ? blackPieces_ : whitePieces_;
+
     opponentPieces.erase(
         std::remove(opponentPieces.begin(), opponentPieces.end(), move.squareTo),
-        opponentPieces.end()
-    );
+        opponentPieces.end());
 }
 
-bool Position::isLegalMove(const Move& move, const Position& positionAfterMove) const {
+bool Position::isLegalMove(const Move& move, const Position& positionAfterMove) const
+{
     const auto& movedPiece = getPieceAt(move.squareFrom);
     if (movedPiece == nullptr) {
         return false;
@@ -136,7 +146,8 @@ bool Position::isLegalMove(const Move& move, const Position& positionAfterMove) 
     if (move.squareFrom == move.squareTo) {
         return false; // Didn't move
     }
-    if (getPieceAt(move.squareTo) != nullptr && getPieceAt(move.squareTo)->getColor() == getSideToMove()) {
+    if (getPieceAt(move.squareTo) != nullptr &&
+        getPieceAt(move.squareTo)->getColor() == getSideToMove()) {
         return false; // Captured friendly piece
     }
     if (!movedPiece->isPseudoLegalMove(move, *this)) {
@@ -147,20 +158,19 @@ bool Position::isLegalMove(const Move& move, const Position& positionAfterMove) 
         int promotionRank = (movedPiece->getColor() == Color::WHITE) ? 7 : 0;
         bool reachesLastRank = (move.squareTo.rank() == promotionRank);
         bool hasValidPromotionPiece =
-            move.promotion == PieceType::KNIGHT ||
-            move.promotion == PieceType::BISHOP ||
-            move.promotion == PieceType::ROOK  ||
-            move.promotion == PieceType::QUEEN;
-        if (reachesLastRank && !hasValidPromotionPiece || 
+            move.promotion == PieceType::KNIGHT || move.promotion == PieceType::BISHOP ||
+            move.promotion == PieceType::ROOK || move.promotion == PieceType::QUEEN;
+        if (reachesLastRank && !hasValidPromotionPiece ||
             !reachesLastRank && hasValidPromotionPiece) {
             return false;
         }
     }
-    
+
     return !positionAfterMove.isKingInCheck(getSideToMove());
 }
 
-Position Position::makeMove(const Move& move) {
+Position Position::makeMove(const Move& move)
+{
     Position newPosition(*this);
     newPosition.updateBoard(move);
     if (!isLegalMove(move, newPosition)) {
@@ -168,15 +178,11 @@ Position Position::makeMove(const Move& move) {
     }
     const auto& movedPiece = getPieceAt(move.squareFrom);
     const auto& capturedPiece = getPieceAt(move.squareTo);
-    
+
     newPosition.halfMoveClock_ = newHalfMoveClock(move.movedPieceType, capturedPiece);
-    newPosition.castlingRights_ = newCastlingRights(
-        move.movedPieceType,
-        sideToMove_,
-        capturedPiece,
-        move,
-        castlingRights_);
-    
+    newPosition.castlingRights_ =
+        newCastlingRights(move.movedPieceType, sideToMove_, capturedPiece, move, castlingRights_);
+
     // If pawn moves two squares, set en passant target
     newPosition.enPassantTarget_ = Square(-1, -1);
     if (move.movedPieceType == PieceType::PAWN) {
@@ -186,22 +192,22 @@ Position Position::makeMove(const Move& move) {
             newPosition.enPassantTarget_ = Square(move.squareFrom.file(), enPassantRank);
         }
     }
-    
+
     if (sideToMove_ == Color::BLACK) {
         newPosition.fullmoveCounter_ = fullmoveCounter_ + 1;
     } else {
         newPosition.fullmoveCounter_ = fullmoveCounter_;
     }
-    
+
     newPosition.sideToMove_ = (sideToMove_ == Color::WHITE) ? Color::BLACK : Color::WHITE;
-    
+
     return newPosition;
 }
 
 int Position::newHalfMoveClock(
     PieceType movedPieceType,
     const std::unique_ptr<chessboard::Piece>& capturedPiece)
-    {
+{
     if (movedPieceType == PieceType::PAWN || capturedPiece != nullptr) {
         return 0;
     } else {
@@ -228,7 +234,7 @@ CastlingRights Position::newCastlingRights(
             newRights.blackQueenSide = false;
         }
     }
-    
+
     // If rook moves from starting position, lose that side's castling right
     if (movedPieceType == PieceType::ROOK) {
         if (movedPieceColor == Color::WHITE) {
@@ -245,7 +251,7 @@ CastlingRights Position::newCastlingRights(
             }
         }
     }
-    
+
     // If rook is captured on its starting square, opponent loses that castling right
     if (capturedPiece != nullptr && capturedPiece->getType() == PieceType::ROOK) {
         if (capturedPiece->getColor() == Color::WHITE) {
@@ -266,9 +272,10 @@ CastlingRights Position::newCastlingRights(
     return newRights;
 }
 
-bool Position::hasLegalMove(Color sideToCheck) const {
+bool Position::hasLegalMove(Color sideToCheck) const
+{
     const std::vector<Square>& vectorOfPieces =
-    (sideToCheck == Color::WHITE) ? whitePieces_ : blackPieces_;
+        (sideToCheck == Color::WHITE) ? whitePieces_ : blackPieces_;
 
     for (const Square& squareFrom : vectorOfPieces) {
         const auto& piece = getPieceAt(squareFrom);
@@ -281,7 +288,7 @@ bool Position::hasLegalMove(Color sideToCheck) const {
             if (piece->getType() == PieceType::PAWN) {
                 int promotionRank = (piece->getColor() == Color::WHITE) ? 7 : 0;
                 if (squareTo.rank() == promotionRank) { // promote to queen to test position
-                    potentialMove = Move(squareFrom, squareTo, piece->getType(), PieceType::QUEEN);  
+                    potentialMove = Move(squareFrom, squareTo, piece->getType(), PieceType::QUEEN);
                 }
             }
             Position testPosition(*this);
@@ -294,99 +301,112 @@ bool Position::hasLegalMove(Color sideToCheck) const {
     return false;
 }
 
-bool Position::isCheckmate(Color sideToCheck) {
+bool Position::isCheckmate(Color sideToCheck)
+{
     if (isKingInCheck(sideToCheck) && !hasLegalMove(sideToCheck)) {
         return true;
     }
     return false;
 }
 
-bool Position::isDrawByStalemate(Color sideToCheck) {
+bool Position::isDrawByStalemate(Color sideToCheck)
+{
     if (!isKingInCheck(sideToCheck) && !hasLegalMove(sideToCheck)) {
         return true;
     }
     return false;
 }
 
-bool Position::isDrawByInsufficientMaterial() {
+bool Position::isDrawByInsufficientMaterial()
+{
     int whiteBishops = 0, whiteKnights = 0, whitePieces = 0;
     int blackBishops = 0, blackKnights = 0, blackPieces = 0;
-    
+
     for (const Square& square : whitePieces_) {
         const auto& piece = getPieceAt(square);
         if (piece != nullptr) {
             PieceType type = piece->getType();
             if (type != PieceType::KING) {
                 whitePieces++;
-                if (type == PieceType::BISHOP) whiteBishops++;
-                else if (type == PieceType::KNIGHT) whiteKnights++;
-                else return false; // Has pawn, rook, or queen
+                if (type == PieceType::BISHOP)
+                    whiteBishops++;
+                else if (type == PieceType::KNIGHT)
+                    whiteKnights++;
+                else
+                    return false; // Has pawn, rook, or queen
             }
         }
     }
-    
+
     for (const Square& square : blackPieces_) {
         const auto& piece = getPieceAt(square);
         if (piece != nullptr) {
             PieceType type = piece->getType();
             if (type != PieceType::KING) {
                 blackPieces++;
-                if (type == PieceType::BISHOP) blackBishops++;
-                else if (type == PieceType::KNIGHT) blackKnights++;
-                else return false; // Has pawn, rook, or queen
+                if (type == PieceType::BISHOP)
+                    blackBishops++;
+                else if (type == PieceType::KNIGHT)
+                    blackKnights++;
+                else
+                    return false; // Has pawn, rook, or queen
             }
         }
     }
-    
+
     // King vs King
-    if (whitePieces == 0 && blackPieces == 0) return true;
-    
+    if (whitePieces == 0 && blackPieces == 0)
+        return true;
+
     // King + minor piece vs King
     if ((whitePieces == 1 && (whiteBishops == 1 || whiteKnights == 1) && blackPieces == 0) ||
         (blackPieces == 1 && (blackBishops == 1 || blackKnights == 1) && whitePieces == 0)) {
         return true;
     }
-    
+
     // King and 2 Knights vs King
     if ((whiteKnights == 2 && whitePieces == 2 && blackPieces == 0) ||
         (blackKnights == 2 && blackPieces == 2 && whitePieces == 0)) {
         return true;
     }
-    
+
     return false;
 }
 
-bool Position::isDrawByHalfMoveClock() {
-    return (halfMoveClock_ >= 50 );
+bool Position::isDrawByHalfMoveClock()
+{
+    return (halfMoveClock_ >= 50);
 }
 
-bool Position::isDraw() {
-    return isDrawByStalemate(sideToMove_) || isDrawByInsufficientMaterial() || isDrawByHalfMoveClock();
+bool Position::isDraw()
+{
+    return isDrawByStalemate(sideToMove_) || isDrawByInsufficientMaterial() ||
+           isDrawByHalfMoveClock();
 }
 
-std::string Position::getBoardFEN() const {
+std::string Position::getBoardFEN() const
+{
     std::string fen;
     for (int rank = 7; rank >= 0; rank--) {
         int emptyCounter = 0;
         for (int file = 0; file < 8; file++) {
             const auto& piece = getPieceAt(file, rank);
-            
+
             if (piece == nullptr) {
                 emptyCounter++;
                 continue;
             }
-            
+
             if (emptyCounter > 0) {
                 fen += std::to_string(emptyCounter);
                 emptyCounter = 0;
             }
-            
+
             char symbol = piece->getSymbol();
-            fen += (piece->getColor() == Color::WHITE)
-                ? symbol
-                : static_cast<char>(std::tolower(symbol));
+            fen += (piece->getColor() == Color::WHITE) ? symbol
+                                                       : static_cast<char>(std::tolower(symbol));
         }
-        
+
         if (emptyCounter > 0) {
             fen += std::to_string(emptyCounter);
         }
@@ -397,9 +417,10 @@ std::string Position::getBoardFEN() const {
     return fen;
 }
 
-std::string Position::getFEN() const {
+std::string Position::getFEN() const
+{
     std::string fen;
-    
+
     std::string boardFen = getBoardFEN();
     fen += boardFen + " ";
 
@@ -407,10 +428,14 @@ std::string Position::getFEN() const {
     fen += " ";
 
     std::string castling;
-    if (castlingRights_.whiteKingSide) castling += "K";
-    if (castlingRights_.whiteQueenSide) castling += "Q";
-    if (castlingRights_.blackKingSide) castling += "k";
-    if (castlingRights_.blackQueenSide) castling += "q";
+    if (castlingRights_.whiteKingSide)
+        castling += "K";
+    if (castlingRights_.whiteQueenSide)
+        castling += "Q";
+    if (castlingRights_.blackKingSide)
+        castling += "k";
+    if (castlingRights_.blackQueenSide)
+        castling += "q";
     fen += castling.empty() ? "-" : castling;
     fen += " ";
 
@@ -426,11 +451,12 @@ std::string Position::getFEN() const {
     fen += " ";
 
     fen += std::to_string(fullmoveCounter_);
-    
+
     return fen;
 }
 
-void Position::setFromFEN(const std::string& fen) {
+void Position::setFromFEN(const std::string& fen)
+{
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             board_[rank][file] = nullptr;
@@ -438,11 +464,11 @@ void Position::setFromFEN(const std::string& fen) {
     }
     whitePieces_.clear();
     blackPieces_.clear();
-    
+
     std::istringstream fenStream(fen);
     std::string piecePlacement, activeColor, castling, enPassant, halfmove, fullmove;
     fenStream >> piecePlacement >> activeColor >> castling >> enPassant >> halfmove >> fullmove;
-    
+
     int rank = 7;
     int file = 0;
     for (char c : piecePlacement) {
@@ -455,9 +481,9 @@ void Position::setFromFEN(const std::string& fen) {
             Color color = std::isupper(c) ? Color::WHITE : Color::BLACK;
             char pieceChar = std::toupper(c);
             Square position(file, rank);
-            
+
             std::unique_ptr<Piece> piece = PieceFactory::fromFENChar(pieceChar, color);
-            
+
             if (piece) {
                 board_[rank][file] = std::move(piece);
                 if (color == Color::WHITE) {
@@ -469,14 +495,14 @@ void Position::setFromFEN(const std::string& fen) {
             file++;
         }
     }
-    
+
     sideToMove_ = (activeColor == "w") ? Color::WHITE : Color::BLACK;
-    
+
     castlingRights_.whiteKingSide = (castling.find('K') != std::string::npos);
     castlingRights_.whiteQueenSide = (castling.find('Q') != std::string::npos);
     castlingRights_.blackKingSide = (castling.find('k') != std::string::npos);
     castlingRights_.blackQueenSide = (castling.find('q') != std::string::npos);
-    
+
     if (enPassant == "-") {
         enPassantTarget_ = Square(-1, -1);
     } else {
@@ -484,7 +510,7 @@ void Position::setFromFEN(const std::string& fen) {
         int enPassantRank = enPassant[1] - '1';
         enPassantTarget_ = Square(enPassantFile, enPassantRank);
     }
-    
+
     halfMoveClock_ = std::stoi(halfmove);
     fullmoveCounter_ = std::stoi(fullmove);
 }
