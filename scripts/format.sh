@@ -15,7 +15,7 @@ if ! command -v clang-format >/dev/null 2>&1; then
     exit 1
 fi
 
-mapfile -d '' FILES < <(find include src tests \
+mapfile -d '' FILES < <(find modules app tests \
     -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \) -print0)
 
 if [[ ${#FILES[@]} -eq 0 ]]; then

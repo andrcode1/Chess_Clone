@@ -1,149 +1,220 @@
 # Software Architecture
 
-**Status:** Proposed target architecture
+**Status:** Proposed layered target architecture
 
-This document describes the intended structure of the chess application during and after the current refactoring. It explains how the main modules interact and where each responsibility belongs. Observable system behaviour and requirements are specified separately in [WorldMachineModel.md](WorldMachineModel.md).
+This document describes the intended structure of the chess application. It explains how the main modules interact and what their responsibilities are. Requirements and specifications of the application are specified separately in [WorldMachineModel.md](WorldMachineModel.md).
 
 ## Architecture overview
 
-The application uses a layered architecture arranged as three major areas:
+The application uses a closed layered architecture with three layers:
+
+1. **Presentation** - the Qt GUI.
+2. **Domain** - application use cases, game modes, PGN handling, and the Chess Core.
+3. **Filesystem** - reading and writing text files.
+
+Stockfish is an external process, not a module of this application. The Domain layer communicates with it over UCI.
+
+Arrows in the diagram are dependencies and stay downward. Runtime notifications may go Application → GUI through an observer interface declared by Application.
 
 ```mermaid
-flowchart LR
-    Core["Chess Core<br/>Position · Move · Square<br/>rules · SAN · FEN"]
-    Application["Application / Game Modes<br/>Analysis · Engine Play<br/>Board Editor"]
-    GameIO["Game I/O<br/>PGN parser and writer<br/>filesystem storage"]
+flowchart TB
+    GUI["Presentation<br/>Qt GUI"]
 
-    Core -->|"chess state and operations"| Application
-    Application <-->|"save and load game data"| GameIO
+    subgraph Domain["Domain"]
+        direction TB
+        subgraph Application["Application"]
+            direction TB
+            Modes["game modes, use cases"]
+            PGN["PGN Codec"]
+
+            Modes -->|"parse and format PGN"| PGN
+        end
+        Core["Chess Core<br/>Position, Move, rules"]
+
+        Modes -->|"chess operations"| Core
+    end
+
+    Filesystem["Filesystem<br/>read and write text files"]
+    Engine["Engine<br/>Stockfish"]
+
+    GUI -->|"user requests"| Domain
+    Domain -->|"read or write text"| Filesystem
+    Domain -->|"UCI"| Engine
 ```
 
-The arrows show the runtime flow of capabilities and data. They do not represent C++ include dependencies.
+The Application and Chess Core are separate modules within the Domain layer, not separate architecture layers.
 
-## Chess Core
+## Presentation layer: GUI
 
-The Chess Core is the domain model and rules engine. It is independent of game modes, user interfaces, chess engines, PGN files, and the operating system.
+The GUI is implemented with Qt and is responsible only for presentation and user interaction.
 
 ### Responsibilities
 
+- Render boards, move histories, analysis variations, clocks, and other interface state.
+- Convert user interaction into calls to the Application API.
+- Display results and errors returned by the Application.
+- Select file paths before requesting a PGN import/export.
+- Copy and paste FEN text via the clipboard, and pass that string to the Application. The GUI does not parse FEN.
+- Implements Application's observer interface and updates widgets when notified. Qt signals stay inside the Presentation layer.
+
+Qt types must not appear in the public APIs of the Application, Chess Core, or Filesystem modules.
+
+## Domain layer
+
+The Domain layer contains the behaviour that defines the chess application. It is divided into the Application and Chess Core components.
+
+### Application component
+
+The Application exposes the use cases called by the GUI.
+
+#### Responsibilities
+
+- Creates game modes (Analysis, Engine Play) and owns their state.
+- Responds to api calls from the GUI, updating game-state, exporting/importing, or reporting an error.
+- Uses Chess Core to properly implement game modes and ensure they are in line with the rules of chess.
+- Calls the Filesystem module api for PGN imports /exports.
+- Handles coding/decoding from and to PGN format.
+- Accepts a FEN string, asks Chess Core to parse and validate it, and applies the resulting position.
+- Returns the currently viewed position as a FEN string.
+- Declares the observer interface, holds a pointer to it, and calls it when session state changes (clock, engine move, game over).
+- Launch and terminate the Stockfish process.
+- Send UCI commands and parse UCI replies.
+- Translate those replies into domain types the rest of Application already uses.
+
+
+#### Rules
+
+- Game modes store canonical `Move` instances, not SAN strings, as their source of truth.
+- Import and export are Application use cases. The GUI/Filesystem layers don't construct or modify a game mode directly.
+- FEN import and export do not go through the Filesystem layer.
+- Only the Application talks to Stockfish.
+
+### Chess Core
+
+The Chess Core represents all necessary chess-related concepts and rules. It is independent from the rest of the application.
+
+#### Responsibilities
+
 - Represent a chess position.
-- Represent moves, squares, pieces, colours, and game results.
+- Represent moves, squares, pieces, colors, and game results.
 - Validate candidate moves and apply legal moves.
 - Detect check, checkmate, stalemate, and position-based draw conditions.
-- Convert positions to and from FEN.
-- Produce and interpret chess move notation such as SAN.
+- Convert positions to and from FEN. Malformed or illegal FEN strings are rejected.
 
-`Position` is the main entry point, but `Move` and `Square` are also public domain types. SAN is derived from a canonical `Move` and the position before that move.
+## Filesystem layer
 
-## Application and game modes
+The Filesystem layer is an intentionally small boundary around operating-system file access.
 
-The Application implements the user-facing use cases by coordinating the Chess Core. Each game mode owns the state and behaviour specific to that mode.
+### Responsibilities
 
-### Analysis
+- Read all text from a requested path.
+- Write text to a requested path.
+- Translate low-level failures into a small, consistent error model.
 
-An analysis session represents positions as a tree:
+## Import and export flows
 
-- Every non-root node is reached by one canonical `Move` from its parent.
-- A node may have multiple ordered children representing variations.
-- One continuation at each branch is ranked first and therefore forms the mainline.
+Import and export are initiated through the Application API. This keeps both flows in the same downward dependency direction.
 
-### Engine play
-
-An engine-play session represents the played game as a linear history:
-
-- The starting `Position`.
-- An ordered sequence of canonical `Move` values.
-- The resulting positions, either stored or reproducible from the starting position.
-- The game result, player colours, clock state, and repetition history.
-- Coordination with an engine API.
-
-### Board editor
-
-The board editor constructs or modifies a `Position` and validates it before another game mode uses it. It does not bypass the invariants required by the Chess Core.
-
-### Shared rules
-
-- Game modes store canonical `Move` values, not SAN strings, as their source of truth.
-- SAN may be calculated when displaying or exporting a move and may be cached only as derived data.
-- Game modes use Chess Core operations rather than implementing chess rules themselves.
-- Analysis and engine play may use different data structures without duplicating PGN formatting or filesystem logic.
-
-## Game I/O
-
-The external import/export area is named **Game I/O**. It translates between application game data and PGN files.
-
-Game I/O contains two distinct internal responsibilities:
-
-1. **PGN codec**
-   - Serializes a linear game or analysis tree into PGN text.
-   - Parses PGN text into a neutral game representation that the Application can validate and load.
-   - Preserves headers, results, comments, annotations, the mainline, and variations where supported.
-
-2. **Filesystem storage**
-   - Reads text from a requested path.
-   - Writes generated text to a requested path.
-   - Reports filesystem failures without changing the active application state.
-
-Keeping these responsibilities separate inside Game I/O allows the PGN codec to be tested without touching the filesystem. It also permits PGN text to be copied to the clipboard, sent over a network, or stored elsewhere without changing chess or game-mode logic.
-
-### Export flow
+### PGN import
 
 ```text
-Application game state
-    -> PGN writer
-    -> PGN text
-    -> filesystem storage
-    -> file
+GUI
+    -> Application import use case
+    -> Filesystem reads the file
+    -> PGN parser produces a neutral PGN document
+    -> Application replays and validates moves through the Chess Core
+    -> Application builds a Game or Analysis session
+    -> Application replaces active state only after every step succeeds
 ```
 
-### Import flow
+A PGN containing variations may be imported into Analysis mode but not into a linear Game mode. A failure to read, parse, or validate leaves the current application state unchanged.
+
+### PGN export
 
 ```text
-file
-    -> filesystem storage
-    -> PGN text
-    -> PGN parser
-    -> validated game data
-    -> Application game state
+GUI
+    -> Application export use case
+    -> Application traverses canonical game or analysis state
+    -> Chess Core produces notation where required
+    -> PGN writer produces text
+    -> Filesystem writes the text to the requested path
 ```
 
-Import is transactional from the user's perspective: the Application replaces its active state only after the file has been read, the PGN has been parsed, and every reconstructed position has been validated successfully.
+### FEN import
 
-## APIs and dependency direction
+```text
+GUI (clipboard string)
+    -> Application calls Core
+    -> Core parses and validates
+    -> Application applies the position
+    -> Application replaces state only on success
+```
 
-In this document, an **API** is the public interface between layers: the contract one module exposes and another module calls.
+### FEN export
 
-- The Chess Core has no dependency on the Application or Game I/O.
-- The Application depends on the Chess Core API and types.
-- Application use cases initiate imports and exports through the Game I/O API.
-- The Game I/O layer implements that API using its PGN codec and filesystem storage.
-- The Application does not depend directly on operating-system filesystem APIs.
+```text
+GUI
+    -> Application (currently viewed position)
+    -> Core produces FEN text
+    -> GUI places the string on the clipboard
+```
 
-This separation allows the PGN codec, filesystem, engine integration, and user interface to change without changing chess rules.
+## CMake targets structure
+
+The intended CMake target direction is:
+
+```text
+chess_gui         -> chess_application
+chess_application -> chess_core
+chess_application -> chess_filesystem
+chess_core         -> no project target
+chess_filesystem   -> no project target
+chess executable   -> composition and startup only
+```
 
 ## Proposed source layout
 
 The final directory names may evolve, but responsibilities should remain separated along these boundaries:
 
 ```text
-include/
+docs/
+scripts/
+modules/
+    application/
+        include/application/
+            api/
+            analysis/
+            play/
+            editor/
+        src/
+            api/
+            analysis/
+            play/
+            editor/
+            pgn/
+        CMakeLists.txt
+    core/
+        include/core/
+            api/
+            pieces/
+        src/
+            api/
+            pieces/
+        CMakeLists.txt
+    filesystem/
+        include/filesystem/
+        src/
+        CMakeLists.txt
+    gui/
+        include/gui/
+        src/
+        CMakeLists.txt
+app/
+    main.cpp
+tests/
+    CMakeLists.txt
     core/
     application/
-        analysis/
-        play/
-        editor/
-        api/
-    io/
-        pgn/
-        filesystem/
-
-src/
-    core/
-    application/
-        analysis/
-        play/
-        editor/
-    io/
-        pgn/
-        filesystem/
+CMakeLists.txt
+README.md
 ```

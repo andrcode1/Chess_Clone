@@ -5,25 +5,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCES
-    src/main.cpp
-    src/core/Square.cpp
-    src/core/Move.cpp
-    src/core/Position.cpp
-    src/game/Game.cpp
-    src/pieces/Piece.cpp
-    src/pieces/PieceFactory.cpp
-    src/pieces/Bishop.cpp
-    src/pieces/King.cpp
-    src/pieces/Knight.cpp
-    src/pieces/Pawn.cpp
-    src/pieces/Queen.cpp
-    src/pieces/Rook.cpp
+    app/main.cpp
 )
 
+add_subdirectory(modules/filesystem)
+add_subdirectory(modules/core)
+add_subdirectory(modules/application)
+add_subdirectory(modules/gui)
 
 add_executable(chess ${SOURCES})
 
-target_include_directories(chess PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(chess PUBLIC chess_gui)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     enable_testing()
