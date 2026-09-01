@@ -1,20 +1,12 @@
-#include "core/pieces/Queen.hpp"
+#include "piece/piece_rules/Queen.hpp"
 #include "core/api/Position.hpp"
+#include "core/Piece.hpp"
+#include <cstdlib>
 
 namespace chessboard
 {
 
-PieceType Queen::getType() const
-{
-    return PieceType::QUEEN;
-}
-
-int Queen::getValue() const
-{
-    return 9;
-}
-
-bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMoveQueen(const Move& move, const Position& position)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
@@ -46,7 +38,7 @@ bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const
     int currentRank = rankFrom + rankDirection;
 
     while (currentFile != fileTo || currentRank != rankTo) {
-        if (position.getPieceAt(currentRank, currentFile) != nullptr) {
+        if (position.getPieceAt(currentFile, currentRank) != Piece::NO_PIECE) {
             return false; // Path is blocked by another piece.
         }
         currentFile += fileDirection;
@@ -56,7 +48,7 @@ bool Queen::isPseudoLegalMove(const Move& move, const Position& position) const
     return true;
 }
 
-std::vector<Square> Queen::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesQueen(const Square& square)
 {
     std::vector<Square> moves;
 

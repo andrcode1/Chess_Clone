@@ -1,20 +1,12 @@
-#include "core/pieces/Bishop.hpp"
+#include "piece/piece_rules/Bishop.hpp"
 #include "core/api/Position.hpp"
+#include "core/Piece.hpp"
+#include <cstdlib>
 
 namespace chessboard
 {
 
-PieceType Bishop::getType() const
-{
-    return PieceType::BISHOP;
-}
-
-int Bishop::getValue() const
-{
-    return 3;
-}
-
-bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMoveBishop(const Move& move, const Position& position)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
@@ -33,7 +25,7 @@ bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
     int currentRank = rankFrom + rankDirection;
 
     while (currentFile != fileTo && currentRank != rankTo) {
-        if (position.getPieceAt(currentFile, currentRank) != nullptr) {
+        if (position.getPieceAt(currentFile, currentRank) != Piece::NO_PIECE) {
             return false; // Path is blocked
         }
         currentFile += fileDirection;
@@ -43,7 +35,7 @@ bool Bishop::isPseudoLegalMove(const Move& move, const Position& position) const
     return true;
 }
 
-std::vector<Square> Bishop::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesBishop(const Square& square)
 {
     std::vector<Square> moves;
 

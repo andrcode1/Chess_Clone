@@ -1,20 +1,12 @@
-#include "core/pieces/Rook.hpp"
+#include "piece/piece_rules/Rook.hpp"
 #include "core/api/Position.hpp"
+#include "core/Piece.hpp"
+#include <algorithm>
 
 namespace chessboard
 {
 
-PieceType Rook::getType() const
-{
-    return PieceType::ROOK;
-}
-
-int Rook::getValue() const
-{
-    return 5;
-}
-
-bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMoveRook(const Move& move, const Position& position)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
@@ -32,7 +24,7 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const
         int start = std::min(rankFrom, rankTo) + 1;
         int end = std::max(rankFrom, rankTo);
         for (int i = start; i < end; i++) {
-            if (position.getPieceAt(i, fileFrom) != nullptr) {
+            if (position.getPieceAt(fileFrom, i) != Piece::NO_PIECE) {
                 return false; // Path is blocked by another piece.
             }
         }
@@ -40,7 +32,7 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const
         int start = std::min(fileFrom, fileTo) + 1;
         int end = std::max(fileFrom, fileTo);
         for (int i = start; i < end; i++) {
-            if (position.getPieceAt(rankFrom, i) != nullptr) {
+            if (position.getPieceAt(i, rankFrom) != Piece::NO_PIECE) {
                 return false; // Path is blocked by another piece.
             }
         }
@@ -48,7 +40,7 @@ bool Rook::isPseudoLegalMove(const Move& move, const Position& position) const
     return true;
 }
 
-std::vector<Square> Rook::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesRook(const Square& square)
 {
     std::vector<Square> moves;
 

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "core/api/Position.hpp"
 #include "core/api/Move.hpp"
-#include "core/Enums.hpp"
+#include "application/play/GameResult.hpp"
 
 namespace chessboard
 {

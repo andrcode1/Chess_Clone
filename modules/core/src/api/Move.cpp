@@ -1,26 +1,25 @@
 #include "core/api/Move.hpp"
 #include "core/api/Position.hpp"
-#include "core/pieces/PieceSymbols.hpp"
+#include "piece/PieceSymbols.hpp"
+#include "piece/piece_rules/PieceRules.hpp"
 
 namespace chessboard
 {
 
-std::string Move::conflictDisambiguation(
-    const Position& positionBeforeMove,
-    const std::unique_ptr<Piece>& movedPiece) const
+std::string Move::conflictDisambiguation(const Position& positionBeforeMove, Piece movedPiece) const
 {
     std::string disambiguationInfo = "";
-    std::vector<Square> squaresToCheck = movedPiece->getPseudoLegalMoves(squareTo);
+    std::vector<Square> squaresToCheck = getPseudoLegalMoves(movedPiece, squareTo);
     std::vector<Square> pieceLocations;
     for (Square sq : squaresToCheck) {
         if (sq == squareFrom) {
             continue;
         }
-        const auto& potentialPiece = positionBeforeMove.getPieceAt(sq);
-        if (potentialPiece == nullptr) {
+        const Piece potentialPiece = positionBeforeMove.getPieceAt(sq);
+        if (potentialPiece == Piece::NO_PIECE) {
             continue;
         }
-        if (potentialPiece->getType() == movedPieceType) {
+        if (typeOf(potentialPiece) == movedPieceType) {
             pieceLocations.push_back(sq);
         }
     }
@@ -71,8 +70,8 @@ std::string Move::toAlgebraic(const Position& positionBeforeMove) const
             algebraicNotation = fileFrom + rankTo;
         }
     } else {
-        const auto& movedPiece = positionBeforeMove.getPieceAt(squareFrom);
-        algebraicNotation += movedPiece->getSymbol();
+        const Piece movedPiece = positionBeforeMove.getPieceAt(squareFrom);
+        algebraicNotation += pieceTypeToSymbol(typeOf(movedPiece));
 
         if (movedPieceType != PieceType::KING) {
             std::string disambiguationInfo = conflictDisambiguation(positionBeforeMove, movedPiece);

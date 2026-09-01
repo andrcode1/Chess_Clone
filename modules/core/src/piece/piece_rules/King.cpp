@@ -1,20 +1,11 @@
-#include "core/pieces/King.hpp"
+#include "piece/piece_rules/King.hpp"
 #include "core/api/Position.hpp"
+#include <cstdlib>
 
 namespace chessboard
 {
 
-PieceType King::getType() const
-{
-    return PieceType::KING;
-}
-
-int King::getValue() const
-{
-    return 0; // King has no material value
-}
-
-bool King::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMoveKing(const Move& move, const Position& position, Color color)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
@@ -27,32 +18,32 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const
     // Check for castling (king moves 2 squares left or right)
     if (std::abs(fileDiff) == 2 && rankDiff == 0) {
 
-        int startingRank = (pieceColor_ == Color::WHITE) ? 0 : 7;
+        int startingRank = (color == Color::WHITE) ? 0 : 7;
         if (rankFrom != startingRank || fileFrom != 4) {
             return false; // King not in starting position
         }
 
         const CastlingRights& rights = position.getCastlingRights();
-        Color enemyColor = (pieceColor_ == Color::WHITE) ? Color::BLACK : Color::WHITE;
+        Color enemyColor = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
 
         // Kingside castling (moving right)
         if (fileDiff == 2) {
-            if (pieceColor_ == Color::WHITE && !rights.whiteKingSide) {
+            if (color == Color::WHITE && !rights.whiteKingSide) {
                 return false;
             }
-            if (pieceColor_ == Color::BLACK && !rights.blackKingSide) {
+            if (color == Color::BLACK && !rights.blackKingSide) {
                 return false;
             }
 
             // Can't castle from check
-            if (position.isKingInCheck(pieceColor_)) {
+            if (position.isKingInCheck(color)) {
                 return false;
             }
             // Passing squares can not be occupied or attacked
             for (int file = 5; file <= 6; file++) {
                 Square square(file, rankFrom);
                 if (position.isSquareAttacked(square, enemyColor) ||
-                    position.getPieceAt(square) != nullptr) {
+                    position.getPieceAt(square) != Piece::NO_PIECE) {
                     return false;
                 }
             }
@@ -61,19 +52,19 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const
         }
         // Queenside castling (moving left)
         else if (fileDiff == -2) {
-            if (pieceColor_ == Color::WHITE && !rights.whiteQueenSide) {
+            if (color == Color::WHITE && !rights.whiteQueenSide) {
                 return false;
             }
-            if (pieceColor_ == Color::BLACK && !rights.blackQueenSide) {
+            if (color == Color::BLACK && !rights.blackQueenSide) {
                 return false;
             }
 
             // Can't castle from check
-            if (position.isKingInCheck(pieceColor_)) {
+            if (position.isKingInCheck(color)) {
                 return false;
             }
             // Square which Rook passes through can not be occupied
-            if (position.getPieceAt(rankFrom, 1) != nullptr) {
+            if (position.getPieceAt(1, rankFrom) != Piece::NO_PIECE) {
                 return false;
             }
 
@@ -81,7 +72,7 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const
             for (int file = fileFrom; file >= 2; file--) {
                 Square square(file, rankFrom);
                 if (position.isSquareAttacked(square, enemyColor) ||
-                    position.getPieceAt(square) != nullptr) {
+                    position.getPieceAt(square) != Piece::NO_PIECE) {
                     return false;
                 }
             }
@@ -97,7 +88,7 @@ bool King::isPseudoLegalMove(const Move& move, const Position& position) const
     return true;
 }
 
-std::vector<Square> King::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesKing(const Square& square)
 {
     std::vector<Square> moves;
 
