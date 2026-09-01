@@ -1,20 +1,11 @@
-#include "core/pieces/Knight.hpp"
+#include "piece/piece_rules/Knight.hpp"
 #include "core/api/Position.hpp"
+#include <cstdlib>
 
 namespace chessboard
 {
 
-PieceType Knight::getType() const
-{
-    return PieceType::KNIGHT;
-}
-
-int Knight::getValue() const
-{
-    return 3;
-}
-
-bool Knight::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMoveKnight(const Move& move, const Position& position)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
@@ -27,7 +18,7 @@ bool Knight::isPseudoLegalMove(const Move& move, const Position& position) const
     return (fileDiff == 2 && rankDiff == 1) || (fileDiff == 1 && rankDiff == 2);
 }
 
-std::vector<Square> Knight::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesKnight(const Square& square)
 {
     std::vector<Square> moves;
 

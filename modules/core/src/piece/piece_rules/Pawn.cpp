@@ -1,28 +1,19 @@
-#include "core/pieces/Pawn.hpp"
+#include "piece/piece_rules/Pawn.hpp"
 #include "core/api/Position.hpp"
+#include <cstdlib>
 
 namespace chessboard
 {
 
-PieceType Pawn::getType() const
-{
-    return PieceType::PAWN;
-}
-
-int Pawn::getValue() const
-{
-    return 1;
-}
-
-bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const
+bool isPseudoLegalMovePawn(const Move& move, const Position& position, Color color)
 {
     int fileFrom = move.squareFrom.file();
     int rankFrom = move.squareFrom.rank();
     int fileTo = move.squareTo.file();
     int rankTo = move.squareTo.rank();
 
-    int direction = (pieceColor_ == Color::WHITE) ? 1 : -1;
-    int startingRank = (pieceColor_ == Color::WHITE) ? 1 : 6;
+    int direction = (color == Color::WHITE) ? 1 : -1;
+    int startingRank = (color == Color::WHITE) ? 1 : 6;
 
     int rankDiff = rankTo - rankFrom;
     int fileDiff = std::abs(fileTo - fileFrom);
@@ -33,15 +24,15 @@ bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const
         }
 
         int middleRank = rankFrom + direction;
-        if (position.getPieceAt(middleRank, fileFrom) != nullptr ||
-            position.getPieceAt(rankTo, fileTo) != nullptr) {
+        if (position.getPieceAt(fileFrom, middleRank) != Piece::NO_PIECE ||
+            position.getPieceAt(fileTo, rankTo) != Piece::NO_PIECE) {
             return false;
         }
         return true;
     }
 
     if ((rankDiff == direction) && (fileDiff == 0)) {
-        if (position.getPieceAt(rankTo, fileTo) != nullptr) {
+        if (position.getPieceAt(fileTo, rankTo) != Piece::NO_PIECE) {
             return false;
         }
         return true;
@@ -49,14 +40,12 @@ bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const
 
     // Captures
     if (rankDiff == direction && fileDiff == 1) {
-        const auto& capturedPiece = position.getPieceAt(rankTo, fileTo);
+        const Piece capturedPiece = position.getPieceAt(fileTo, rankTo);
 
-        // Check if there's an enemy piece to capture and that it is an enemy piece
-        if ((capturedPiece != nullptr) && (capturedPiece->getColor() != pieceColor_)) {
+        if ((capturedPiece != Piece::NO_PIECE) && (colorOf(capturedPiece) != color)) {
             return true;
         }
 
-        // Check for en passant
         Square enPassantTarget = position.getEnPassantTarget();
         if (enPassantTarget.rank() != -1 && enPassantTarget.file() != -1) {
             if (enPassantTarget == move.squareTo) {
@@ -69,14 +58,14 @@ bool Pawn::isPseudoLegalMove(const Move& move, const Position& position) const
     return false;
 }
 
-std::vector<Square> Pawn::getPseudoLegalMoves(const Square& square) const
+std::vector<Square> getPseudoLegalMovesPawn(const Square& square, Color color)
 {
     std::vector<Square> moves;
 
     int file = square.file();
     int rank = square.rank();
-    int direction = (pieceColor_ == Color::WHITE) ? 1 : -1;
-    int startingRank = (pieceColor_ == Color::WHITE) ? 1 : 6;
+    int direction = (color == Color::WHITE) ? 1 : -1;
+    int startingRank = (color == Color::WHITE) ? 1 : 6;
 
     moves.push_back(Square(file, rank + direction));
     moves.push_back(Square(file - 1, rank + direction));

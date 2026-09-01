@@ -1,8 +1,9 @@
 #pragma once
 
 #include "core/api/Move.hpp"
-#include "core/pieces/Piece.hpp"
+#include "core/Piece.hpp"
 #include <vector>
+#include <string>
 
 namespace chessboard
 {
@@ -21,7 +22,7 @@ struct CastlingRights
 class Position
 {
 private:
-    std::unique_ptr<Piece> board_[8][8];
+    Piece board_[8][8]{};
     std::vector<Square> whitePieces_;
     std::vector<Square> blackPieces_;
     Color sideToMove_;
@@ -32,35 +33,32 @@ private:
     int halfMoveClock_;
     int fullmoveCounter_;
 
-    static std::unique_ptr<Piece> clonePiece(const Piece* piece);
-
 public:
     Position()
         : sideToMove_(Color::WHITE), halfMoveClock_(0), fullmoveCounter_(1),
           enPassantTarget_(-1, -1)
     {}
 
-    Position(const Position& other);
+    Position(const Position&) = default;
+    Position& operator=(const Position&) = default;
     Position(Position&&) = default;
     Position& operator=(Position&&) = default;
 
     Color getSideToMove() const;
-    const std::unique_ptr<Piece>& getPieceAt(Square square) const;
-    const std::unique_ptr<Piece>& getPieceAt(int file, int rank) const;
+    Piece getPieceAt(Square square) const;
+    Piece getPieceAt(int file, int rank) const;
     int getHalfmoveClock() const;
     int getFullmoveCounter() const;
     const CastlingRights& getCastlingRights() const;
     Square getEnPassantTarget() const;
 
     void setSideToMove(Color side);
-    void setPieceAt(int rank, int file, std::unique_ptr<Piece> piece);
-    int newHalfMoveClock(
-        PieceType movedPieceType,
-        const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece);
+    void setPieceAt(int file, int rank, Piece piece);
+    int newHalfMoveClock(PieceType movedPieceType, Piece potentiallyCapturedPiece);
     CastlingRights newCastlingRights(
         PieceType movedPieceType,
         Color movedPieceColor,
-        const std::unique_ptr<chessboard::Piece>& potentiallyCapturedPiece,
+        Piece potentiallyCapturedPiece,
         const Move& move,
         const CastlingRights& currentRights) const;
 

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "core/pieces/Piece.fwd.hpp"
 #include "core/api/Position.fwd.hpp"
 #include "core/Square.hpp"
-#include "core/Enums.hpp"
-#include <memory>
+#include "core/Piece.hpp"
 #include <string>
 
 namespace chessboard
@@ -35,9 +33,7 @@ struct Move
     {}
 
     std::string toAlgebraic(const Position& positionBeforeMove) const;
-    std::string conflictDisambiguation(
-        const Position& positionBeforeMove,
-        const std::unique_ptr<Piece>& movedPiece) const;
+    std::string conflictDisambiguation(const Position& positionBeforeMove, Piece movedPiece) const;
 };
 
 } // namespace chessboard
